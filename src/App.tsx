@@ -2,6 +2,7 @@ import { signOut } from './lib/supabase'
 import { useSession } from './lib/useSession'
 import { useHashRoute, type Route } from './lib/useHashRoute'
 import SignIn from './SignIn'
+import ThemeSwitch from './ThemeSwitch'
 import NotesPage from './features/notes/NotesPage'
 import CalendarPage from './features/calendar/CalendarPage'
 import TasksPage from './features/tasks/TasksPage'
@@ -38,6 +39,7 @@ export default function App() {
           My To-do
         </div>
         {links}
+        <ThemeSwitch />
         <div className="account">
           <div className="email">{session.user.email}</div>
           <button onClick={signOut}>Sign out</button>
@@ -48,7 +50,10 @@ export default function App() {
         {route === 'tasks' && <TasksPage />}
         {route === 'notes' && <NotesPage />}
       </main>
-      <nav className="tabbar">{links}</nav>
+      <nav className="tabbar">
+        {links}
+        <ThemeSwitch compact />
+      </nav>
     </div>
   )
 }
