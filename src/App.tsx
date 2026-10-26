@@ -6,37 +6,49 @@ import NotesPage from './features/notes/NotesPage'
 import CalendarPage from './features/calendar/CalendarPage'
 import TasksPage from './features/tasks/TasksPage'
 
-const tabs: { route: Route; label: string }[] = [
-  { route: 'tasks', label: 'Tasks' },
-  { route: 'calendar', label: 'Calendar' },
-  { route: 'notes', label: 'Notes' },
+const tabs: { route: Route; label: string; icon: string }[] = [
+  { route: 'calendar', label: 'Calendar', icon: '◷' },
+  { route: 'tasks', label: 'Tasks', icon: '✓' },
+  { route: 'notes', label: 'Notes', icon: '✎' },
 ]
 
 export default function App() {
   const session = useSession()
   const route = useHashRoute()
 
-  if (session === undefined) return <main className="loading">Loading…</main>
+  if (session === undefined) return <main className="loading-screen">Loading…</main>
   if (!session) return <SignIn />
+
+  const links = tabs.map((t) => (
+    <a key={t.route} href={`#/${t.route}`} aria-current={route === t.route ? 'page' : undefined}>
+      <span className="nav-icon" aria-hidden>
+        {t.icon}
+      </span>
+      {t.label}
+    </a>
+  ))
 
   return (
     <div className="shell">
-      <header>
-        <nav>
-          {tabs.map((t) => (
-            <a key={t.route} href={`#/${t.route}`} aria-current={route === t.route ? 'page' : undefined}>
-              {t.label}
-            </a>
-          ))}
-        </nav>
-        <span className="user">{session.user.email}</span>
-        <button onClick={signOut}>Sign out</button>
-      </header>
-      <main>
-        {route === 'notes' && <NotesPage />}
+      <nav className="sidebar">
+        <div className="brand">
+          <span className="logo" aria-hidden>
+            ✦
+          </span>
+          My To-do
+        </div>
+        {links}
+        <div className="account">
+          <div className="email">{session.user.email}</div>
+          <button onClick={signOut}>Sign out</button>
+        </div>
+      </nav>
+      <main className="content">
         {route === 'calendar' && <CalendarPage />}
         {route === 'tasks' && <TasksPage />}
+        {route === 'notes' && <NotesPage />}
       </main>
+      <nav className="tabbar">{links}</nav>
     </div>
   )
 }

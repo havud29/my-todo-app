@@ -6,7 +6,7 @@ const routes: Route[] = ['notes', 'calendar', 'tasks']
 
 function read(): Route {
   const name = window.location.hash.replace(/^#\/?/, '')
-  return (routes as string[]).includes(name) ? (name as Route) : 'tasks'
+  return (routes as string[]).includes(name) ? (name as Route) : 'calendar'
 }
 
 export function useHashRoute() {
