@@ -1,8 +1,9 @@
 import { useSyncExternalStore } from 'react'
 
-export type Theme = 'aero-classic' | 'aero-modern'
+export type Theme = 'aero-classic' | 'aero-glossy' | 'aero-modern'
 export const themes: { id: Theme; label: string }[] = [
   { id: 'aero-classic', label: 'Classic' },
+  { id: 'aero-glossy', label: 'Glossy' },
   { id: 'aero-modern', label: 'Modern' },
 ]
 

@@ -80,6 +80,179 @@
 }
 .tab-like:hover { background: none; }
 
+/* ---------- Glossy: bright Vista / Wii era (the first Classic) ---------- */
+:root[data-theme='aero-glossy'] {
+  --bg: #9fd8ff;
+  --surface: rgb(255 255 255 / 0.62);
+  --surface-2: rgb(225 243 255 / 0.75);
+  --border: rgb(120 175 225 / 0.55);
+  --text: #163c5e;
+  --text-h: #062c4f;
+  --muted: #4d7397;
+  --accent: #1a8de6;
+  --accent-2: #3ec0ff;
+  --accent-soft: rgb(80 180 255 / 0.22);
+  --shadow-sm: 0 2px 6px rgb(16 80 140 / 0.18), inset 0 1px 0 rgb(255 255 255 / 0.9);
+  --shadow: 0 18px 40px -10px rgb(10 70 130 / 0.45), inset 0 1px 0 rgb(255 255 255 / 0.95);
+  --radius: 12px;
+  font-family: 'Segoe UI', 'Source Sans 3', Frutiger, 'Frutiger Linotype', Tahoma, sans-serif;
+}
+:root[data-theme='aero-glossy'] body {
+  background:
+    /* rolling green hills */
+    radial-gradient(120% 60% at 20% 112%, #7ed957 0 38%, #4fae2a 52%, transparent 53%),
+    radial-gradient(110% 55% at 85% 115%, #a3e86f 0 36%, #5fbf33 50%, transparent 51%),
+    /* sun glow */
+    radial-gradient(40rem 26rem at 78% 8%, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0) 70%),
+    /* clouds */
+    radial-gradient(14rem 5rem at 18% 18%, rgb(255 255 255 / 0.9), transparent 70%),
+    radial-gradient(18rem 6rem at 30% 22%, rgb(255 255 255 / 0.75), transparent 70%),
+    radial-gradient(16rem 5rem at 62% 32%, rgb(255 255 255 / 0.7), transparent 70%),
+    /* sky */
+    linear-gradient(180deg, #1679d8 0%, #49a9f2 30%, #9dd8ff 62%, #e3f6ff 80%);
+  background-attachment: fixed;
+}
+
+/* Glass panels with a bright top edge and a sheen */
+:root[data-theme='aero-glossy'] :is(.sidebar, .month, .agenda, .week, .signin-card, .event-dialog) {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.75) 0%, rgb(255 255 255 / 0.35) 45%, rgb(255 255 255 / 0.55) 100%);
+  backdrop-filter: blur(14px) saturate(1.4);
+  border: 1px solid rgb(255 255 255 / 0.85);
+  box-shadow: var(--shadow);
+}
+:root[data-theme='aero-glossy'] .sidebar { margin: 12px 0 12px 12px; border-radius: 16px; height: calc(100dvh - 24px); }
+:root[data-theme='aero-glossy'] .month-weekdays,
+:root[data-theme='aero-glossy'] .week-head {
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.9), rgb(205 232 255 / 0.7) 50%, rgb(185 222 255 / 0.65) 51%, rgb(225 243 255 / 0.8));
+}
+:root[data-theme='aero-glossy'] .month-cell { border-color: rgb(120 175 225 / 0.35); }
+:root[data-theme='aero-glossy'] .month-cell:hover { background: rgb(255 255 255 / 0.45); }
+:root[data-theme='aero-glossy'] .month-cell.outside { background: rgb(200 225 245 / 0.25); }
+:root[data-theme='aero-glossy'] .month-cell.selected { background: rgb(120 200 255 / 0.28); }
+:root[data-theme='aero-glossy'] .month-cell.selected::after { border-color: #2b9cf0; box-shadow: inset 0 0 12px rgb(60 170 255 / 0.5); }
+
+/* Headings with an embossed look */
+:root[data-theme='aero-glossy'] :is(.cal-title, .signin-card h1) {
+  color: #fff;
+  text-shadow: 0 1px 0 rgb(0 60 120 / 0.5), 0 2px 10px rgb(0 70 140 / 0.45);
+}
+:root[data-theme='aero-glossy'] .signin-card h1 { color: #0b4f8a; text-shadow: 0 1px 0 #fff; }
+
+/* Glossy pill buttons with the classic half-and-half shine */
+:root[data-theme='aero-glossy'] button {
+  border-radius: 999px;
+  border: 1px solid #7fb0de;
+  color: #0b3b66;
+  background: linear-gradient(180deg, #ffffff 0%, #eef7ff 48%, #d3e9fc 50%, #e8f4ff 100%);
+  box-shadow: inset 0 1px 0 #fff, 0 1px 3px rgb(20 80 140 / 0.25);
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.8);
+}
+:root[data-theme='aero-glossy'] button:hover {
+  background: linear-gradient(180deg, #ffffff 0%, #e2f3ff 48%, #bfe2ff 50%, #dff1ff 100%);
+  border-color: #4da0e6;
+  box-shadow: inset 0 1px 0 #fff, 0 0 10px rgb(80 180 255 / 0.55);
+}
+:root[data-theme='aero-glossy'] button.primary {
+  color: #fff;
+  border: 1px solid #0f6fc0;
+  background: linear-gradient(180deg, #8fd8ff 0%, #3bb0ff 48%, #1386e8 50%, #33b1ff 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.8), 0 3px 10px rgb(10 100 200 / 0.45);
+  text-shadow: 0 -1px 0 rgb(0 60 130 / 0.5);
+}
+:root[data-theme='aero-glossy'] button.primary:hover { filter: brightness(1.08); }
+:root[data-theme='aero-glossy'] :is(.chip, .block, .agenda-item, .swatch, .segmented button, .tab-like, .link-btn) {
+  text-shadow: none;
+}
+:root[data-theme='aero-glossy'] .segmented { background: rgb(255 255 255 / 0.4); border: 1px solid #a9cdee; border-radius: 999px; }
+:root[data-theme='aero-glossy'] .segmented button { border: 0; background: none; box-shadow: none; border-radius: 999px; }
+:root[data-theme='aero-glossy'] .segmented button:is([aria-selected='true'], [aria-checked='true']) {
+  color: #fff;
+  background: linear-gradient(180deg, #8fd8ff 0%, #3bb0ff 48%, #1386e8 50%, #33b1ff 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7);
+}
+:root[data-theme='aero-glossy'] .danger { color: var(--danger); }
+:root[data-theme='aero-glossy'] .danger.solid {
+  color: #fff;
+  border-color: #b3121c;
+  background: linear-gradient(180deg, #ff9a9a 0%, #f25050 48%, #d9202a 50%, #f04b4b 100%);
+}
+
+/* Glossy orbs for today and the logo */
+:root[data-theme='aero-glossy'] :is(.day-num.today, .week-day.today .dn, .logo) {
+  background:
+    radial-gradient(circle at 50% 18%, rgb(255 255 255 / 0.9) 0 22%, rgb(255 255 255 / 0) 48%),
+    radial-gradient(circle at 50% 100%, #8af05d 0%, #3bb21b 55%, #24860c 100%);
+  color: #fff;
+  text-shadow: 0 1px 1px rgb(0 70 0 / 0.5);
+  box-shadow: 0 2px 6px rgb(30 110 10 / 0.45), inset 0 -2px 4px rgb(0 60 0 / 0.25);
+}
+:root[data-theme='aero-glossy'] .week-day.today .wd,
+:root[data-theme='aero-glossy'] .agenda-weekday { color: #2a8a12; }
+
+/* Sidebar items */
+:root[data-theme='aero-glossy'] .sidebar a { color: #23527f; }
+:root[data-theme='aero-glossy'] .sidebar a:hover { background: rgb(255 255 255 / 0.55); }
+:root[data-theme='aero-glossy'] .sidebar a[aria-current='page'] {
+  color: #fff;
+  background: linear-gradient(180deg, #8fd8ff 0%, #3bb0ff 48%, #1386e8 50%, #33b1ff 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), 0 2px 8px rgb(10 100 200 / 0.4);
+  text-shadow: 0 -1px 0 rgb(0 60 130 / 0.4);
+}
+
+/* Glossy event chips and blocks */
+:root[data-theme='aero-glossy'] .chip,
+:root[data-theme='aero-glossy'] .block {
+  border: 1px solid color-mix(in srgb, var(--ev) 70%, #fff);
+  border-left: 1px solid color-mix(in srgb, var(--ev) 70%, #fff);
+  border-radius: 6px;
+  color: #fff;
+  background: linear-gradient(180deg, var(--ev-2) 0%, var(--ev) 50%, color-mix(in srgb, var(--ev) 85%, #000) 51%, var(--ev) 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), 0 1px 3px rgb(0 40 90 / 0.25);
+  text-shadow: 0 1px 1px rgb(0 0 0 / 0.25);
+}
+:root[data-theme='aero-glossy'] .chip-time { opacity: 0.9; }
+:root[data-theme='aero-glossy'] .block { border-radius: 8px; }
+:root[data-theme='aero-glossy'] .agenda-item {
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.5));
+  border: 1px solid rgb(255 255 255 / 0.9);
+  box-shadow: 0 2px 6px rgb(16 80 140 / 0.15);
+}
+:root[data-theme='aero-glossy'] .agenda-bar {
+  background: linear-gradient(180deg, var(--ev-2), var(--ev));
+  width: 6px;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6);
+}
+:root[data-theme='aero-glossy'] .swatch {
+  background: radial-gradient(circle at 50% 22%, rgb(255 255 255 / 0.85) 0 20%, rgb(255 255 255 / 0) 45%), var(--ev);
+  border-color: #fff;
+}
+:root[data-theme='aero-glossy'] .dot { background: radial-gradient(circle at 40% 30%, #fff 0 15%, var(--ev) 50%); width: 7px; height: 7px; }
+
+/* Dialog: frosted window with a glossy title band */
+:root[data-theme='aero-glossy'] .event-dialog { border-radius: 14px; }
+:root[data-theme='aero-glossy'] .dialog-accent {
+  height: 10px;
+  background: linear-gradient(180deg, var(--ev-2), var(--ev) 50%, color-mix(in srgb, var(--ev) 85%, #000) 51%, var(--ev));
+}
+:root[data-theme='aero-glossy'] .event-dialog :is(input, select, textarea) {
+  background: rgb(255 255 255 / 0.85);
+  border: 1px solid #a9cdee;
+  box-shadow: inset 0 1px 3px rgb(20 80 140 / 0.15);
+}
+:root[data-theme='aero-glossy'] .event-dialog .title-input { background: none; border: 0; border-bottom: 2px solid #a9cdee; box-shadow: none; }
+:root[data-theme='aero-glossy'] .event-dialog::backdrop { background: rgb(10 60 120 / 0.3); }
+
+:root[data-theme='aero-glossy'] .tabbar {
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.85), rgb(210 235 255 / 0.75) 50%, rgb(190 225 255 / 0.75) 51%, rgb(230 245 255 / 0.85));
+  border-top: 1px solid #fff;
+  box-shadow: 0 -4px 16px rgb(10 70 130 / 0.25);
+}
+:root[data-theme='aero-glossy'] .tabbar a[aria-current='page'] { color: #0f74c8; }
+:root[data-theme='aero-glossy'] .fab { border-radius: 50%; }
+:root[data-theme='aero-glossy'] .now-line { border-top-color: #ff7a00; }
+:root[data-theme='aero-glossy'] .now-line::before { background: radial-gradient(circle at 40% 30%, #fff 0 15%, #ff7a00 55%); }
+
 /* ---------- Modern: soft frosted glass ---------- */
 :root[data-theme='aero-modern'] {
   --bg: #e6f7ff;
@@ -239,4 +412,6 @@
 :root[data-theme='aero-modern'] .chip,
 :root[data-theme='aero-modern'] .block { border: 0; border-left: 3px solid var(--ev); box-shadow: 0 1px 4px rgb(20 90 130 / 0.1); color: var(--ev-ink); }
 :root[data-theme='aero-modern'] .chip.solid { border-left: 0; color: #fff; }
-:root[data-theme='aero-modern'] .signin { background: transparent; }
+:root[data-theme='aero-modern'] .signin,
+:root[data-theme='aero-glossy'] .signin { background: transparent; }
+.sidebar .theme-switch .segmented button { padding: 0.4rem 0.2rem; font-size: 0.8rem; min-width: 0; }
