@@ -1,0 +1,319 @@
+/*
+ * Art themes: Art Nouveau, Art Deco, Impressionist and Epic Fantasy.
+ * Each theme sets the tokens below; the shared rules turn them into panels,
+ * buttons, chips and dialogs. Wallpapers live in public/art (see tools/).
+ */
+:root:is([data-theme='art-nouveau'], [data-theme='art-deco'], [data-theme='impressionist'], [data-theme='epic']) {
+  --title-font: inherit;
+  --title-case: none;
+  --title-spacing: 0;
+  --panel-bg: var(--surface);
+  --panel-border: 1px solid var(--border);
+  --panel-shadow: var(--shadow);
+  --panel-blur: none;
+  --btn-bg: var(--surface);
+  --btn-border: 1px solid var(--border);
+  --btn-shadow: none;
+  --btn-radius: 10px;
+  --primary-bg: var(--accent);
+  --primary-ink: var(--accent-text);
+  --primary-shadow: none;
+  --today-bg: var(--accent);
+  --today-ink: var(--accent-text);
+  --wall: none;
+  --wall-portrait: var(--wall);
+}
+
+/* ---------- Shared ---------- */
+:root:is([data-theme='art-nouveau'], [data-theme='art-deco'], [data-theme='impressionist'], [data-theme='epic']) {
+  & body { background: var(--wall) center / cover fixed, var(--bg); }
+  & .signin { background: transparent; }
+
+  & :is(.sidebar, .month, .agenda, .week, .signin-card, .event-dialog, .placeholder) {
+    background: var(--panel-bg);
+    border: var(--panel-border);
+    box-shadow: var(--panel-shadow);
+    backdrop-filter: var(--panel-blur);
+  }
+  & .placeholder { margin: 1.5rem; border-radius: var(--radius); }
+  & .sidebar { margin: 14px 0 14px 14px; height: calc(100dvh - 28px); border-radius: var(--radius); }
+
+  & :is(h1, h2, .cal-title, .brand, .agenda-date, .signin-card h1, .event-dialog .title-input) {
+    font-family: var(--title-font);
+    text-transform: var(--title-case);
+    letter-spacing: var(--title-spacing);
+  }
+
+  & button:not(.swatch, .tab-like, .link-btn, .chip, .agenda-item, .block, .win-btn, .primary, .danger) {
+    background: var(--btn-bg);
+    border: var(--btn-border);
+    border-radius: var(--btn-radius);
+    box-shadow: var(--btn-shadow);
+    color: var(--text-h);
+  }
+  & button:not(.swatch, .tab-like, .link-btn, .chip, .agenda-item, .block, .win-btn, .primary, .danger):hover { filter: brightness(1.06); }
+  & button.primary {
+    background: var(--primary-bg);
+    color: var(--primary-ink);
+    border: var(--btn-border);
+    border-radius: var(--btn-radius);
+    box-shadow: var(--primary-shadow);
+  }
+  & .segmented { background: color-mix(in srgb, var(--surface-2) 70%, transparent); border-radius: calc(var(--btn-radius) + 3px); }
+  & .segmented button { background: none; border: 0; box-shadow: none; color: var(--muted); border-radius: var(--btn-radius); }
+  & .segmented button[aria-selected='true'] { background: var(--panel-bg); color: var(--accent); box-shadow: var(--shadow-sm); }
+  & button.fab { border-radius: var(--btn-radius); }
+
+  & :is(.day-num.today, .week-day.today .dn, .logo) { background: var(--today-bg); color: var(--today-ink); }
+  & .week-day.today .wd, & .agenda-weekday { color: var(--accent); }
+  & .month-cell { border-color: color-mix(in srgb, var(--border) 70%, transparent); }
+  & .month-cell.outside { background: color-mix(in srgb, var(--surface-2) 35%, transparent); }
+  & .month-cell:hover { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+  & .month-cell.selected { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+
+  /* Event colours: tinted from the event colour so they suit light and dark themes alike */
+  & :is(.chip, .block, .agenda-item) {
+    background: color-mix(in srgb, var(--ev) 20%, var(--surface-solid));
+    color: color-mix(in srgb, var(--ev) 45%, var(--text-h));
+  }
+  & .chip.solid { background: var(--ev); color: #fff; }
+  & :is(.agenda-meta, .chip-time, .block-time) { color: inherit; opacity: 0.8; }
+  & .agenda-item { border: 1px solid color-mix(in srgb, var(--ev) 30%, transparent); }
+
+  & .event-dialog :is(input, select, textarea) { background: color-mix(in srgb, var(--surface-solid) 80%, transparent); border: 1px solid var(--border); color: var(--text-h); }
+  & .event-dialog .title-input { background: none; border: 0; border-bottom: 2px solid var(--border); }
+  & .danger:not(.solid) { color: var(--danger); background: none; border: 0; }
+  & .swatch { border-color: var(--surface-solid); }
+
+  & .tabbar { background: var(--panel-bg); border-top: var(--panel-border); backdrop-filter: var(--panel-blur); }
+  & .tabbar a[aria-current='page'], & .sidebar a[aria-current='page'] { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  & .tab-like, & .tab-like:hover { background: none; border: 0; box-shadow: none; color: var(--muted); }
+}
+@media (max-aspect-ratio: 4/5) {
+  :root:is([data-theme='art-nouveau'], [data-theme='art-deco'], [data-theme='impressionist'], [data-theme='epic']) body {
+    background-image: var(--wall-portrait);
+  }
+}
+@media (max-width: 760px) {
+  :root:is([data-theme='art-nouveau'], [data-theme='art-deco'], [data-theme='impressionist'], [data-theme='epic']) .sidebar { display: none; }
+}
+
+/* ---------- Art Nouveau: Mucha posters, whiplash lilies, gold haloes ---------- */
+:root[data-theme='art-nouveau'] {
+  color-scheme: light;
+  --bg: #efe3c6;
+  --surface: rgb(250 243 226 / 0.9);
+  --surface-solid: #faf3e2;
+  --surface-2: #efe2c4;
+  --border: #c9ad78;
+  --text: #4a3a26;
+  --text-h: #3a2a17;
+  --muted: #8a7353;
+  --accent: #7d6a2c;
+  --accent-2: #b0563c;
+  --accent-soft: #eadcae;
+  --accent-text: #fff8e8;
+  --danger: #a8402e;
+  --shadow-sm: 0 1px 3px rgb(90 60 20 / 0.15);
+  --shadow: 0 18px 40px -20px rgb(90 60 20 / 0.45);
+  --radius: 28px;
+  --title-font: Federant, 'Cormorant Garamond', serif;
+  --title-spacing: 0.02em;
+  --panel-bg:
+    linear-gradient(rgb(250 243 226 / 0.84), rgb(246 236 212 / 0.88));
+  --panel-border: 2px solid #a7803f;
+  --panel-shadow: 0 0 0 5px rgb(250 243 226 / 0.75), 0 0 0 6px #c9a86a, var(--shadow);
+  --btn-bg: linear-gradient(#fbf4e3, #ecdcb5);
+  --btn-border: 1px solid #a7803f;
+  --btn-radius: 999px;
+  --btn-shadow: inset 0 1px 0 #fffaf0;
+  --primary-bg: linear-gradient(#8d9a5c, #5e6b3c);
+  --primary-ink: #fbf4e3;
+  --primary-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 4px 10px -4px rgb(60 70 30 / 0.6);
+  --today-bg: radial-gradient(circle, #f6e2a8, #c9a24c);
+  --today-ink: #3a2a17;
+  --wall: url('/art/nouveau.svg');
+  --wall-portrait: url('/art/nouveau-portrait.svg');
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 16.5px;
+  font-weight: 500;
+}
+/* Mucha's arched panel tops */
+:root[data-theme='art-nouveau'] :is(.month, .week, .signin-card) { border-radius: 90px 90px 18px 18px / 46px 46px 18px 18px; padding-top: 10px; }
+:root[data-theme='art-nouveau'] .sidebar { border-radius: 110px 110px 22px 22px / 70px 70px 22px 22px; padding-top: 2.4rem; }
+:root[data-theme='art-nouveau'] .agenda { border-radius: 22px 22px 70px 70px / 22px 22px 40px 40px; }
+:root[data-theme='art-nouveau'] .cal-title { font-size: 2rem; color: #5e4a1c; }
+:root[data-theme='art-nouveau'] .cal-title::before,
+:root[data-theme='art-nouveau'] .cal-title::after { content: '❦'; color: #a7803f; font-size: 0.8em; margin: 0 0.4em; }
+:root[data-theme='art-nouveau'] .cal-title::before { display: inline-block; transform: scaleX(-1); }
+:root[data-theme='art-nouveau'] .month-weekdays div,
+:root[data-theme='art-nouveau'] .week-day .wd { font-family: Federant, serif; color: #7d6a2c; }
+:root[data-theme='art-nouveau'] .day-num { font-family: Federant, serif; }
+:root[data-theme='art-nouveau'] .chip { border-radius: 999px; border-left: 0; }
+:root[data-theme='art-nouveau'] .agenda-item { border-radius: 24px 6px 24px 6px; }
+:root[data-theme='art-nouveau'] .event-dialog { border-radius: 60px 60px 18px 18px / 36px 36px 18px 18px; }
+:root[data-theme='art-nouveau'] .logo { border-radius: 50%; box-shadow: 0 0 0 2px #a7803f; }
+
+/* ---------- Art Deco: Gatsby gold, sunbursts, stepped skylines ---------- */
+:root[data-theme='art-deco'] {
+  color-scheme: dark;
+  --bg: #0b111d;
+  --surface: rgb(11 16 28 / 0.92);
+  --surface-solid: #101828;
+  --surface-2: #18223a;
+  --border: #6f5a25;
+  --text: #e9dfc4;
+  --text-h: #f6ecd0;
+  --muted: #a99a74;
+  --accent: #d4af37;
+  --accent-2: #f0d27a;
+  --accent-soft: rgb(212 175 55 / 0.15);
+  --accent-text: #0b111d;
+  --danger: #e0664f;
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.5);
+  --shadow: 0 24px 50px -20px rgb(0 0 0 / 0.8);
+  --radius: 0px;
+  --title-font: Limelight, 'Poiret One', serif;
+  --title-case: uppercase;
+  --title-spacing: 0.12em;
+  --panel-bg: linear-gradient(rgb(13 19 33 / 0.8), rgb(8 12 22 / 0.86));
+  --panel-blur: blur(3px);
+  --panel-border: 2px solid #d4af37;
+  --panel-shadow: inset 0 0 0 4px #0b111d, inset 0 0 0 5px rgb(212 175 55 / 0.6), var(--shadow);
+  --btn-bg: linear-gradient(#18223a, #0e1626);
+  --btn-border: 1px solid #b8962e;
+  --btn-radius: 0px;
+  --btn-shadow: inset 0 0 0 2px #0b111d, inset 0 0 0 3px rgb(212 175 55 / 0.35);
+  --primary-bg: linear-gradient(135deg, #f6e3a1, #d4af37 45%, #a87b1e 70%, #f0d27a);
+  --primary-ink: #0b111d;
+  --primary-shadow: 0 0 18px -4px rgb(212 175 55 / 0.6);
+  --today-bg: linear-gradient(135deg, #f6e3a1, #d4af37 50%, #a87b1e);
+  --today-ink: #0b111d;
+  --wall: url('/art/deco.svg');
+  --wall-portrait: url('/art/deco-portrait.svg');
+  font-family: 'Josefin Sans', 'Century Gothic', sans-serif;
+}
+:root[data-theme='art-deco'] :is(.month-weekdays div, .week-day .wd, .agenda-weekday, button:not(.chip, .agenda-item, .block), .sidebar a, .tabbar a) {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+:root[data-theme='art-deco'] .cal-title {
+  font-size: 1.9rem;
+  background: linear-gradient(180deg, #fbefc4, #d4af37 55%, #a87b1e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/* Stepped corners on panels, from the skyscraper silhouettes */
+:root[data-theme='art-deco'] :is(.month, .week, .agenda, .sidebar, .signin-card, .event-dialog) {
+  clip-path: polygon(14px 0, calc(100% - 14px) 0, calc(100% - 14px) 7px, calc(100% - 7px) 7px, calc(100% - 7px) 14px, 100% 14px,
+    100% calc(100% - 14px), calc(100% - 7px) calc(100% - 14px), calc(100% - 7px) calc(100% - 7px), calc(100% - 14px) calc(100% - 7px), calc(100% - 14px) 100%,
+    14px 100%, 14px calc(100% - 7px), 7px calc(100% - 7px), 7px calc(100% - 14px), 0 calc(100% - 14px),
+    0 14px, 7px 14px, 7px 7px, 14px 7px);
+}
+:root[data-theme='art-deco'] .month-weekdays { border-bottom: 1px solid #d4af37; }
+:root[data-theme='art-deco'] .day-num { font-family: 'Poiret One', sans-serif; font-weight: 400; font-size: 1rem; }
+:root[data-theme='art-deco'] :is(.day-num.today, .week-day.today .dn) { border-radius: 0; width: 34px; height: 34px; margin: -4px 0 -4px -4px; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+:root[data-theme='art-deco'] .chip { border-radius: 0; border-left: 3px solid var(--ev); }
+:root[data-theme='art-deco'] .agenda-item { border-radius: 0; }
+:root[data-theme='art-deco'] .month-cell.selected::after { border-color: #d4af37; border-radius: 0; }
+:root[data-theme='art-deco'] .sidebar a[aria-current='page'] { box-shadow: inset 3px 0 0 #d4af37; }
+
+/* ---------- Impressionist: Monet's water garden ---------- */
+:root[data-theme='impressionist'] {
+  color-scheme: light;
+  --bg: #b9cfd6;
+  --surface: rgb(252 249 240 / 0.78);
+  --surface-solid: #fcf9f0;
+  --surface-2: rgb(234 240 232 / 0.8);
+  --border: rgb(150 170 160 / 0.45);
+  --text: #3d4a5c;
+  --text-h: #2b3550;
+  --muted: #6f7f8f;
+  --accent: #5b74b8;
+  --accent-2: #d98aa6;
+  --accent-soft: rgb(91 116 184 / 0.14);
+  --accent-text: #fff;
+  --danger: #c25a6a;
+  --shadow-sm: 0 2px 6px rgb(60 80 110 / 0.12);
+  --shadow: 0 20px 50px -24px rgb(40 60 100 / 0.45);
+  --radius: 26px;
+  --title-font: Parisienne, 'Cormorant Garamond', cursive;
+  --panel-bg: linear-gradient(170deg, rgb(255 252 244 / 0.82), rgb(240 245 238 / 0.7));
+  --panel-border: 1px solid rgb(255 255 255 / 0.7);
+  --panel-shadow: var(--shadow);
+  --panel-blur: blur(10px) saturate(1.2);
+  --btn-bg: rgb(255 253 246 / 0.75);
+  --btn-border: 1px solid rgb(150 170 160 / 0.5);
+  --btn-radius: 16px 12px 18px 10px;
+  --primary-bg: linear-gradient(120deg, #6d86c6, #9a8fcf 50%, #d98aa6);
+  --primary-ink: #fff;
+  --primary-shadow: 0 8px 18px -8px rgb(91 116 184 / 0.7);
+  --today-bg: radial-gradient(circle at 35% 35%, #f6c9d6, #d98aa6 60%, #b5698a);
+  --today-ink: #fff;
+  --wall: url('/art/impressionist.jpg');
+  --wall-portrait: url('/art/impressionist-portrait.jpg');
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 16.5px;
+  font-weight: 500;
+}
+/* Panels with loosely brushed edges */
+:root[data-theme='impressionist'] :is(.month, .week, .agenda, .sidebar, .signin-card, .event-dialog) {
+  border-radius: 34px 22px 38px 26px / 26px 36px 24px 34px;
+}
+:root[data-theme='impressionist'] .cal-title { font-size: 2.4rem; font-weight: 400; color: #3f5290; letter-spacing: 0; text-shadow: 0 0 6px #fffdf4, 0 0 14px #fffdf4, 0 0 24px rgb(255 253 244 / 0.8); }
+:root[data-theme='impressionist'] :is(h1, h2, .cal-title, .brand, .agenda-date) { font-weight: 400; text-transform: none; }
+:root[data-theme='impressionist'] .agenda-date { font-size: 1.6rem; }
+:root[data-theme='impressionist'] .chip { border-radius: 10px 6px 12px 5px; border-left: 0; }
+:root[data-theme='impressionist'] .agenda-item { border-radius: 20px 12px 22px 10px; }
+
+/* ---------- Epic Fantasy: DeviantArt matte painting ---------- */
+:root[data-theme='epic'] {
+  color-scheme: dark;
+  --bg: #0b0d1c;
+  --surface: rgb(16 16 34 / 0.72);
+  --surface-solid: #15152a;
+  --surface-2: rgb(40 36 70 / 0.6);
+  --border: rgb(196 150 80 / 0.4);
+  --text: #e3dccb;
+  --text-h: #fbf3dd;
+  --muted: #a49cb5;
+  --accent: #f0a646;
+  --accent-2: #ff7a3c;
+  --accent-soft: rgb(240 166 70 / 0.16);
+  --accent-text: #1a0e05;
+  --danger: #ff6b5b;
+  --shadow-sm: 0 2px 6px rgb(0 0 0 / 0.5);
+  --shadow: 0 28px 60px -20px rgb(0 0 0 / 0.85);
+  --radius: 10px;
+  --title-font: 'Cinzel Decorative', Cinzel, serif;
+  --title-spacing: 0.06em;
+  --panel-bg: linear-gradient(180deg, rgb(28 24 52 / 0.62), rgb(10 10 24 / 0.72));
+  --panel-border: 1px solid rgb(214 168 92 / 0.75);
+  --panel-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.6), inset 0 0 0 3px rgb(214 168 92 / 0.18), 0 0 30px -8px rgb(240 166 70 / 0.35), var(--shadow);
+  --panel-blur: blur(8px);
+  --btn-bg: linear-gradient(180deg, #3a3350, #1b1830 60%, #120f22);
+  --btn-border: 1px solid #b88b48;
+  --btn-radius: 4px;
+  --btn-shadow: inset 0 1px 0 rgb(255 230 180 / 0.25), 0 2px 6px rgb(0 0 0 / 0.5);
+  --primary-bg: linear-gradient(180deg, #ffd38a, #f0a646 45%, #c0601e);
+  --primary-ink: #1a0e05;
+  --primary-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5), 0 0 18px -2px rgb(255 140 50 / 0.7);
+  --today-bg: radial-gradient(circle at 40% 35%, #fff1c9, #f0a646 55%, #b0501a);
+  --today-ink: #1a0e05;
+  --wall: url('/art/epic.jpg');
+  --wall-portrait: url('/art/epic-portrait.jpg');
+  font-family: Spectral, Georgia, serif;
+}
+:root[data-theme='epic'] .cal-title {
+  font-size: 1.9rem;
+  background: linear-gradient(180deg, #fff4d6, #f0c27a 50%, #b57a2e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 10px rgb(240 166 70 / 0.45));
+}
+:root[data-theme='epic'] :is(.month-weekdays div, .week-day .wd, .agenda-weekday, .sidebar a, .tabbar a, button) { font-family: Cinzel, serif; letter-spacing: 0.05em; }
+:root[data-theme='epic'] .day-num.today { box-shadow: 0 0 14px rgb(255 160 60 / 0.8); }
+:root[data-theme='epic'] .month-cell.selected::after { border-color: rgb(240 166 70 / 0.8); box-shadow: inset 0 0 14px rgb(240 166 70 / 0.25); }
+:root[data-theme='epic'] .chip.solid { box-shadow: 0 0 10px -2px var(--ev); }

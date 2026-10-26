@@ -1,30 +1,40 @@
-import { setTheme, themes, useTheme } from './lib/theme'
+import { setTheme, themes, useTheme, type Theme } from './lib/theme'
 
 export default function ThemeSwitch({ compact = false }: { compact?: boolean }) {
   const theme = useTheme()
+  const current = themes.find((t) => t.id === theme)
+  const select = (
+    <select
+      className="theme-select"
+      value={theme}
+      onChange={(e) => setTheme(e.target.value as Theme)}
+      aria-label="Theme"
+    >
+      {themes.map((t) => (
+        <option key={t.id} value={t.id}>
+          {t.label}
+        </option>
+      ))}
+    </select>
+  )
 
+  // On phones the tab shows the current theme and opens the native picker
   if (compact) {
-    const next = themes[(themes.findIndex((t) => t.id === theme) + 1) % themes.length]
     return (
-      <button className="tab-like" onClick={() => setTheme(next.id)} aria-label={`Switch to ${next.label} theme`}>
+      <label className="tab-like theme-tab">
         <span className="nav-icon" aria-hidden>
           ◐
         </span>
-        {themes.find((t) => t.id === theme)?.label}
-      </button>
+        {current?.label}
+        {select}
+      </label>
     )
   }
 
   return (
-    <div className="theme-switch">
-      <div className="theme-label">Theme</div>
-      <div className="segmented" role="radiogroup" aria-label="Theme">
-        {themes.map((t) => (
-          <button key={t.id} role="radio" aria-checked={theme === t.id} onClick={() => setTheme(t.id)}>
-            {t.label}
-          </button>
-        ))}
-      </div>
-    </div>
+    <label className="theme-switch">
+      <span className="theme-label">Theme</span>
+      {select}
+    </label>
   )
 }

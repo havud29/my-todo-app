@@ -415,3 +415,19 @@
 :root[data-theme='aero-modern'] .signin,
 :root[data-theme='aero-glossy'] .signin { background: transparent; }
 .sidebar .theme-switch .segmented button { padding: 0.4rem 0.2rem; font-size: 0.8rem; min-width: 0; }
+
+/* Theme picker */
+.theme-switch { display: flex; flex-direction: column; }
+.theme-select {
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-h);
+}
+.theme-tab { position: relative; cursor: pointer; }
+.theme-tab .theme-select { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
