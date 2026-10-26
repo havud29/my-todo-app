@@ -3,6 +3,8 @@ import { useSession } from './lib/useSession'
 import { useHashRoute, type Route } from './lib/useHashRoute'
 import SignIn from './SignIn'
 import ThemeSwitch from './ThemeSwitch'
+import ClassicShell from './ClassicShell'
+import { useTheme } from './lib/theme'
 import NotesPage from './features/notes/NotesPage'
 import CalendarPage from './features/calendar/CalendarPage'
 import TasksPage from './features/tasks/TasksPage'
@@ -16,9 +18,26 @@ const tabs: { route: Route; label: string; icon: string }[] = [
 export default function App() {
   const session = useSession()
   const route = useHashRoute()
+  const theme = useTheme()
 
   if (session === undefined) return <main className="loading-screen">Loading…</main>
   if (!session) return <SignIn />
+
+  const page = (
+    <>
+      {route === 'calendar' && <CalendarPage />}
+      {route === 'tasks' && <TasksPage />}
+      {route === 'notes' && <NotesPage />}
+    </>
+  )
+
+  if (theme === 'aero-classic') {
+    return (
+      <ClassicShell session={session} route={route}>
+        {page}
+      </ClassicShell>
+    )
+  }
 
   const links = tabs.map((t) => (
     <a key={t.route} href={`#/${t.route}`} aria-current={route === t.route ? 'page' : undefined}>
@@ -45,11 +64,7 @@ export default function App() {
           <button onClick={signOut}>Sign out</button>
         </div>
       </nav>
-      <main className="content">
-        {route === 'calendar' && <CalendarPage />}
-        {route === 'tasks' && <TasksPage />}
-        {route === 'notes' && <NotesPage />}
-      </main>
+      <main className="content">{page}</main>
       <nav className="tabbar">
         {links}
         <ThemeSwitch compact />

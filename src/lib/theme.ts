@@ -8,7 +8,7 @@ export const themes: { id: Theme; label: string }[] = [
 
 const key = 'theme'
 const listeners = new Set<() => void>()
-let current: Theme = 'aero-modern'
+let current: Theme = 'aero-classic'
 
 try {
   const t = localStorage.getItem(key)

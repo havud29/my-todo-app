@@ -1,0 +1,623 @@
+/* Classic: Windows Vista / 7 Aero, after the real controls.
+   Control colors follow 7.css (MIT, github.com/khang-nd/7.css), which
+   measured them from Windows 7. The wallpaper and icons in public/aero
+   were made for this app (tools/aero-wallpaper.py). */
+
+:root[data-theme='aero-classic'] {
+  color-scheme: light;
+  --bg: #3a8fe0;
+  --surface: #ffffff;
+  --surface-2: #f0f0f0;
+  --border: #d5dfe5;
+  --text: #1e1e1e;
+  --text-h: #000;
+  --muted: #5a6470;
+  --accent: #3399ff;
+  --accent-2: #3399ff;
+  --accent-soft: #e5f3fb;
+  --danger: #d54f36;
+  --radius: 6px;
+  --shadow-sm: none;
+  --shadow: 2px 2px 10px 1px #000000b3;
+  --w7-title: #003399;
+  --w7-btn: linear-gradient(#f2f2f2 45%, #ebebeb 45%, #cfcfcf);
+  --w7-btn-h: linear-gradient(#eaf6fd 45%, #bee6fd 45%, #a7d9f5);
+  --w7-btn-a: linear-gradient(#e5f4fc, #c4e5f6 30% 50%, #98d1ef 50%, #68b3db);
+  --w7-sel: linear-gradient(#dcebfc, #c1dbfc);
+  --w7-glass: linear-gradient(135deg, #fff5 70px, transparent 100px), linear-gradient(225deg, #fff5 70px, transparent 100px),
+    linear-gradient(54deg, #0002 0 4%, #6661 6% 6%, #0002 8% 10%, #0002 15% 16%, #aaa1 17% 18%, #0002 23% 24%, #bbb2 25% 26%,
+      #0002 31% 33%, #0002 34% 34.5%, #bbb2 36% 40%, #0002 41% 41.5%, #bbb2 44% 45%, #bbb2 46% 47%, #0002 48% 49%,
+      #0002 50% 50.5%, #0002 56% 56.5%, #bbb2 57% 63%, #0002 67% 69%, #bbb2 69.5% 70%, #0002 73.5% 74%, #bbb2 74.5% 79%,
+      #0002 80% 84%, #aaa2 85% 86%, #0002 87%, #bbb1 90%);
+  font: 12px/1.4 'Segoe UI', 'Noto Sans', Tahoma, sans-serif;
+  letter-spacing: 0;
+}
+:root[data-theme='aero-classic'] body {
+  background: #2f86d8 url('/aero/wallpaper.jpg') center / cover fixed;
+}
+@media (max-aspect-ratio: 4/5) {
+  :root[data-theme='aero-classic'] body { background-image: url('/aero/wallpaper-portrait.jpg'); }
+}
+:root[data-theme='aero-classic'] .backdrop { display: none; }
+:root[data-theme='aero-classic'] :is(h1, h2) { letter-spacing: 0; }
+
+/* ---------- Buttons, fields and selection (Windows 7 controls) ---------- */
+:root[data-theme='aero-classic'] button {
+  font: inherit;
+  font-weight: 400;
+  color: #000;
+  min-height: 23px;
+  padding: 0 12px;
+  border: 1px solid #707070;
+  border-radius: 3px;
+  background: var(--w7-btn);
+  box-shadow: inset 0 0 0 1px #fffc;
+  text-shadow: none;
+  transition: border-color 0.3s;
+}
+:root[data-theme='aero-classic'] button:hover { border-color: #3c7fb1; background: var(--w7-btn-h); }
+:root[data-theme='aero-classic'] button:active { border-color: #2c628b; background: var(--w7-btn-a); box-shadow: inset 1px 1px 0 #0003, inset -1px 1px 0 #0001; transform: none; }
+:root[data-theme='aero-classic'] button:focus-visible { outline: 1px dotted #000; outline-offset: -4px; box-shadow: inset 0 0 0 2px #98d1ef; }
+:root[data-theme='aero-classic'] button.primary {
+  color: #000;
+  border-color: #3c7fb1;
+  background: var(--w7-btn-h);
+  box-shadow: inset 0 0 3px 1px #34deffdd;
+  animation: w7-pulse 1s ease infinite alternate;
+  filter: none;
+}
+@keyframes w7-pulse {
+  from { box-shadow: inset 0 0 3px 1px #34deffdd; }
+  to { box-shadow: inset 0 0 1px 1px #34deffdd; }
+}
+@media (prefers-reduced-motion: reduce) { :root[data-theme='aero-classic'] button.primary { animation: none; } }
+:root[data-theme='aero-classic'] .icon-btn { width: 27px; height: 23px; min-height: 23px; padding: 0; font-size: 15px; }
+:root[data-theme='aero-classic'] .danger:not(.solid) { color: #000; }
+:root[data-theme='aero-classic'] .danger.solid {
+  color: #fff;
+  border-color: #8b1a0d;
+  background: linear-gradient(#e0a197, #cf796a 45%, #d54f36 45%, #e57f6d);
+}
+:root[data-theme='aero-classic'] .link-btn { color: #0066cc; border: 0; background: none; box-shadow: none; padding: 0; min-height: 0; }
+:root[data-theme='aero-classic'] .link-btn:hover { color: #3399ff; text-decoration: underline; background: none; }
+
+:root[data-theme='aero-classic'] .event-dialog :is(input, select, textarea) {
+  font: inherit;
+  color: #000;
+  background: #fff;
+  border: 1px solid;
+  border-color: #abadb3 #dbdfe6 #e3e9ef #e2e3ea;
+  border-radius: 2px;
+  padding: 3px 4px;
+  min-height: 23px;
+  box-shadow: none;
+}
+:root[data-theme='aero-classic'] .event-dialog :is(input, select, textarea):hover { border-color: #5794bf #b7d5ea #c7e2f1 #c5daed; }
+:root[data-theme='aero-classic'] .event-dialog :is(input, select, textarea):focus { border-color: #3d7bad #a4c9e3 #b7d9ed #b5cfe7; background: #fff; outline: none; }
+:root[data-theme='aero-classic'] .event-dialog select { background: var(--w7-btn); border: 1px solid #707070; border-radius: 3px; }
+:root[data-theme='aero-classic'] .event-dialog .title-input { font-size: 15px; color: var(--w7-title); padding: 4px 5px; border-radius: 2px; }
+:root[data-theme='aero-classic'] .event-dialog .title-input:focus { border-color: #3d7bad #a4c9e3 #b7d9ed #b5cfe7; }
+
+/* Checkbox in place of the modern switch */
+:root[data-theme='aero-classic'] .switch { font-weight: 400; font-size: 12px; gap: 6px; }
+:root[data-theme='aero-classic'] .switch .track {
+  width: 13px; height: 13px; border-radius: 0;
+  border: 1px solid #8e8f8f;
+  background: linear-gradient(135deg, #dcdcdc, #fff);
+  box-shadow: inset 0 0 0 1px #f4f4f4;
+}
+:root[data-theme='aero-classic'] .switch .track::after { display: none; }
+:root[data-theme='aero-classic'] .switch input:checked + .track { background: linear-gradient(135deg, #dcdcdc, #fff); }
+:root[data-theme='aero-classic'] .switch input:checked + .track::before {
+  content: ''; position: absolute; left: 3px; top: 0px; width: 4px; height: 8px;
+  border: solid #4a5f97; border-width: 0 2px 2px 0; transform: rotate(45deg);
+}
+:root[data-theme='aero-classic'] .switch:hover .track { border-color: #3c7fb1; background: linear-gradient(135deg, #b1dffd, #e9f7fe); }
+
+/* Segmented view switch drawn as Win7 toggle buttons */
+:root[data-theme='aero-classic'] .segmented { background: none; border: 0; padding: 0; gap: 0; border-radius: 0; }
+:root[data-theme='aero-classic'] .segmented button { border-radius: 0; margin-left: -1px; min-width: 56px; color: #000; background: var(--w7-btn); box-shadow: inset 0 0 0 1px #fffc; }
+:root[data-theme='aero-classic'] .segmented button:first-child { border-radius: 3px 0 0 3px; margin-left: 0; }
+:root[data-theme='aero-classic'] .segmented button:last-child { border-radius: 0 3px 3px 0; }
+:root[data-theme='aero-classic'] .segmented button:is([aria-selected='true'], [aria-checked='true']) {
+  background: var(--w7-btn-a);
+  border-color: #2c628b;
+  box-shadow: inset 1px 1px 0 #0003, inset -1px 1px 0 #0001;
+  color: #000;
+}
+
+/* ---------- Aero window frame ---------- */
+:root[data-theme='aero-classic'] .win {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border: 1px solid #000000b3;
+  border-radius: 7px;
+  background: rgb(69 128 196 / 0.55);
+  background-image: var(--w7-glass);
+  background-attachment: fixed;
+  box-shadow: 2px 2px 10px 1px #000000b3, inset 0 0 0 1px #fffa;
+  backdrop-filter: blur(6px);
+}
+:root[data-theme='aero-classic'] .win-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 6px 0 8px;
+}
+:root[data-theme='aero-classic'] .win-icon { width: 16px; height: 16px; margin-top: 7px; }
+:root[data-theme='aero-classic'] .win-title-text {
+  flex: 1;
+  padding-top: 6px;
+  color: #000;
+  font-size: 12px;
+  text-shadow: 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+:root[data-theme='aero-classic'] .win-controls {
+  display: flex;
+  margin-top: -1px;
+  background: #fff3;
+  border: 1px solid #000000b3;
+  border-top: 0;
+  border-radius: 0 0 5px 5px;
+  box-shadow: 0 1px 0 #fffa, 1px 0 0 #fffa, -1px 0 0 #fffa;
+  overflow: hidden;
+}
+:root[data-theme='aero-classic'] .win-btn {
+  position: relative;
+  display: block;
+  width: 26px;
+  height: 18px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-right: 1px solid #000000b3;
+  border-radius: 0;
+  background: linear-gradient(#ffffff80, #ffffff4d 45%, #0000001a 50%, #0000001a 75%, #ffffff80);
+  box-shadow: inset 0 0 0 1px #fff5;
+  animation: none;
+}
+:root[data-theme='aero-classic'] .win-btn:last-child { border-right: 0; }
+:root[data-theme='aero-classic'] .win-btn::after { content: ''; position: absolute; inset: 0; margin: auto; filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px #fff); }
+:root[data-theme='aero-classic'] .win-btn.min::after { width: 9px; height: 3px; top: 7px; background: #fff; border: 1px solid #333; border-radius: 1px; }
+:root[data-theme='aero-classic'] .win-btn.max::after { width: 9px; height: 7px; border: 1px solid #333; border-top-width: 3px; background: none; box-shadow: inset 0 0 0 1px #fff; }
+:root[data-theme='aero-classic'] .win-btn.close {
+  width: 43px;
+  background:
+    radial-gradient(circle at -60% 50%, #0007 5% 10%, #0000 50%),
+    radial-gradient(circle at 160% 50%, #0007 5% 10%, #0000 50%),
+    linear-gradient(#e0a197e5, #cf796a 25% 50%, #d54f36 50%);
+}
+:root[data-theme='aero-classic'] button.win-btn.close:hover {
+  background:
+    radial-gradient(circle at 50% 170%, #f9c592 10% 20%, #0000 60%),
+    radial-gradient(circle at -60% 50%, #000a 5% 10%, #0000 50%),
+    radial-gradient(circle at 160% 50%, #000a 5% 10%, #0000 50%),
+    linear-gradient(#fb9d8b, #ee6d56 25% 50%, #d42809 50%);
+}
+:root[data-theme='aero-classic'] .win-btn.close::after {
+  content: '✕';
+  width: auto; height: auto;
+  display: grid; place-items: center;
+  color: #fff;
+  font: bold 12px/18px 'Segoe UI', Arial, sans-serif;
+  text-shadow: 0 0 2px #000, 0 0 1px #000;
+  filter: none;
+}
+:root[data-theme='aero-classic'] .win-body {
+  flex: 1;
+  min-height: 0;
+  margin: 0 7px 7px;
+  background: #fff;
+  border: 1px solid #000000b3;
+  box-shadow: 0 0 0 1px #fff9;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Desktop and taskbar ---------- */
+:root[data-theme='aero-classic'] .desktop { height: 100dvh; display: flex; flex-direction: column; }
+:root[data-theme='aero-classic'] .desktop-area { flex: 1; min-height: 0; padding: 14px 16px 12px; overflow: auto; }
+:root[data-theme='aero-classic'] .cal-desktop { display: flex; gap: 16px; height: 100%; align-items: flex-start; }
+:root[data-theme='aero-classic'] .cal-window { flex: 1; min-width: 0; height: 100%; min-height: 560px; }
+:root[data-theme='aero-classic'] .cal-desktop > .agenda { margin-top: 4px; max-height: calc(100% - 8px); }
+
+:root[data-theme='aero-classic'] .taskbar {
+  position: relative;
+  z-index: 30;
+  flex: none;
+  height: 40px;
+  display: flex;
+  align-items: stretch;
+  padding-left: 58px;
+  background:
+    linear-gradient(#ffffff40, #ffffff14 50%, #00000014 50%, #00000033),
+    rgb(16 40 74 / 0.62);
+  border-top: 1px solid #ffffff59;
+  box-shadow: inset 0 1px 0 #0000004d;
+  backdrop-filter: blur(8px) saturate(1.3);
+}
+:root[data-theme='aero-classic'] .start-wrap { position: absolute; left: 4px; bottom: 0; height: 40px; width: 50px; }
+:root[data-theme='aero-classic'] .start-orb {
+  position: absolute;
+  left: 2px;
+  top: -3px;
+  width: 46px;
+  height: 46px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid #0a234d;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 18%, #ffffffd9, #ffffff00 70%),
+    radial-gradient(circle at 50% 100%, #8ef0ff 0, #2bb4ff 25%, #0b62c9 55%, #082f73 100%);
+  box-shadow: 0 0 0 2px #ffffff40, 0 2px 6px #000a, inset 0 -3px 8px #4cf2ff99;
+  display: grid;
+  place-items: center;
+}
+:root[data-theme='aero-classic'] .start-orb:hover, :root[data-theme='aero-classic'] .start-orb.open {
+  border-color: #0a234d;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 18%, #ffffffe6, #ffffff00 70%),
+    radial-gradient(circle at 50% 100%, #c4fbff 0, #47d0ff 28%, #1279e3 58%, #0a3a8a 100%);
+  box-shadow: 0 0 0 2px #ffffff66, 0 0 14px #5fd8ff, inset 0 -3px 8px #8ff7ff;
+}
+:root[data-theme='aero-classic'] .start-orb img { width: 22px; height: 22px; filter: drop-shadow(0 1px 1px #0008); }
+
+:root[data-theme='aero-classic'] .task-buttons { display: flex; gap: 2px; padding: 2px 4px; }
+:root[data-theme='aero-classic'] .task-btn {
+  position: relative;
+  width: 60px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: #fff;
+  text-decoration: none;
+}
+:root[data-theme='aero-classic'] .task-btn img { width: 30px; height: 30px; filter: drop-shadow(0 1px 2px #0007); }
+:root[data-theme='aero-classic'] .task-btn .task-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+:root[data-theme='aero-classic'] .task-btn:hover {
+  border-color: #ffffff66;
+  background: radial-gradient(ellipse 80% 60% at 50% 100%, #8fd8ff99, #0000 70%), linear-gradient(#ffffff33, #ffffff0d 50%, #ffffff00 50%, #ffffff1a);
+  box-shadow: inset 0 0 0 1px #ffffff26;
+}
+:root[data-theme='aero-classic'] .task-btn[aria-current='page'] {
+  border-color: #ffffff80;
+  background: radial-gradient(ellipse 85% 55% at 50% 105%, #9be8ffcc, #0000 70%), linear-gradient(#ffffff59, #ffffff1f 50%, #ffffff0d 50%, #ffffff26);
+  box-shadow: inset 0 0 0 1px #ffffff33, 0 0 6px #0006;
+}
+
+:root[data-theme='aero-classic'] .tray {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.25;
+  text-shadow: 0 0 6px #000, 0 0 2px #000;
+}
+:root[data-theme='aero-classic'] .show-desktop {
+  width: 14px;
+  border-left: 1px solid #ffffff4d;
+  box-shadow: inset 1px 0 0 #0006;
+  background: linear-gradient(90deg, #ffffff14, #ffffff33);
+}
+
+/* Start menu */
+:root[data-theme='aero-classic'] .start-menu {
+  position: absolute;
+  left: 0;
+  bottom: 42px;
+  width: 400px;
+  display: flex;
+  padding: 7px;
+  border: 1px solid #000000b3;
+  border-radius: 7px;
+  background: rgb(22 52 98 / 0.88);
+  background-image: var(--w7-glass);
+  background-attachment: fixed;
+  box-shadow: 2px 2px 14px 2px #000c, inset 0 0 0 1px #fff8;
+  backdrop-filter: blur(8px);
+}
+:root[data-theme='aero-classic'] .start-left {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #000000b3;
+  border-radius: 4px;
+  padding: 6px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 300px;
+}
+:root[data-theme='aero-classic'] .start-item { display: flex; gap: 8px; align-items: center; padding: 5px 6px; border: 1px solid transparent; border-radius: 3px; color: #000; text-decoration: none; }
+:root[data-theme='aero-classic'] .start-item img { width: 32px; height: 32px; }
+:root[data-theme='aero-classic'] .start-item span { display: flex; flex-direction: column; }
+:root[data-theme='aero-classic'] .start-item small { color: #6d6d6d; font-size: 11px; }
+:root[data-theme='aero-classic'] .start-item:hover, :root[data-theme='aero-classic'] .start-item:focus-visible { border-color: #7da2ce; background: var(--w7-sel); box-shadow: inset 0 0 0 1px #ebf4fd; outline: none; }
+:root[data-theme='aero-classic'] .start-right { width: 150px; display: flex; flex-direction: column; align-items: stretch; padding: 4px 6px 2px 10px; color: #fff; }
+:root[data-theme='aero-classic'] .user-tile {
+  align-self: center;
+  width: 58px; height: 58px;
+  margin: -32px 0 6px;
+  padding: 4px;
+  border-radius: 6px;
+  border: 1px solid #fff9;
+  background: linear-gradient(#ffffffb3, #ffffff4d 50%, #ffffff26 50%, #ffffff66);
+  box-shadow: 0 2px 6px #0009;
+}
+:root[data-theme='aero-classic'] .user-tile span {
+  display: grid; place-items: center; width: 100%; height: 100%;
+  border-radius: 3px;
+  font-size: 26px; font-weight: 600; color: #fff;
+  background: radial-gradient(circle at 50% 30%, #ffffffa6, #ffffff00 55%), linear-gradient(160deg, #6fd84a, #1f8fd6);
+  text-shadow: 0 1px 2px #0008;
+}
+:root[data-theme='aero-classic'] .start-user { text-align: center; font-weight: 600; margin-bottom: 10px; text-shadow: 0 0 6px #000; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+:root[data-theme='aero-classic'] .start-section { font-size: 11px; color: #cfe6ff; margin: 2px 0 2px 4px; text-shadow: 0 0 4px #000; }
+:root[data-theme='aero-classic'] .start-link {
+  text-align: left;
+  color: #fff;
+  background: none;
+  border: 1px solid transparent;
+  box-shadow: none;
+  padding: 4px 8px;
+  text-shadow: 0 0 6px #000, 0 0 2px #000;
+}
+:root[data-theme='aero-classic'] .start-link:hover { color: #fff; border-color: #ffffff66; background: linear-gradient(#ffffff40, #ffffff14 50%, #ffffff00 50%, #ffffff1a); }
+:root[data-theme='aero-classic'] .shutdown {
+  margin-top: auto;
+  align-self: flex-end;
+  color: #fff;
+  border: 1px solid #00000099;
+  background: linear-gradient(#ffffff59, #ffffff26 45%, #00000026 50%, #ffffff1a);
+  box-shadow: inset 0 0 0 1px #ffffff4d;
+  text-shadow: 0 0 4px #000;
+}
+:root[data-theme='aero-classic'] .shutdown:hover { color: #fff; border-color: #000; background: radial-gradient(circle at 50% 110%, #ff9b7e, #0000 70%), linear-gradient(#ffffff73, #ffffff33 45%, #c8462d 50%, #e2735c); }
+
+/* ---------- Calendar inside the window ---------- */
+:root[data-theme='aero-classic'] .calendar { padding: 0; gap: 0; height: 100%; }
+:root[data-theme='aero-classic'] .cal-toolbar {
+  gap: 8px;
+  padding: 5px 8px;
+  background: linear-gradient(#fafcff, #e6eff9 45%, #dce7f5 46%, #e5eef8);
+  border-bottom: 1px solid #a0afc3;
+  box-shadow: inset 0 1px 0 #fff;
+}
+:root[data-theme='aero-classic'] .cal-title,
+:root[data-theme='aero-classic'] .cal-title {
+  font: 400 17px 'Segoe UI', 'Noto Sans', sans-serif;
+  color: var(--w7-title);
+  min-width: 10rem;
+  text-shadow: none;
+  background: none;
+  -webkit-background-clip: border-box;
+}
+:root[data-theme='aero-classic'] .cal-controls { gap: 6px; }
+:root[data-theme='aero-classic'] .nav-group { gap: 2px; }
+:root[data-theme='aero-classic'] .banner { border-radius: 0; margin: 6px; background: #ffffe1; border: 1px solid #c7b88d; color: #000; }
+:root[data-theme='aero-classic'] .cal-body { padding: 10px; gap: 10px; background: #fff; }
+
+:root[data-theme='aero-classic'] .month, :root[data-theme='aero-classic'] .week {
+  border: 1px solid #a0afc3;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+:root[data-theme='aero-classic'] .month-weekdays, :root[data-theme='aero-classic'] .week-head {
+  background: linear-gradient(#fff, #f1f5fb 50%, #e3ebf6 50%, #eaf0f8);
+  border-bottom: 1px solid #a0afc3;
+}
+:root[data-theme='aero-classic'] .month-weekdays div { color: #333; font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 12px; text-align: center; }
+:root[data-theme='aero-classic'] .month-cell { border-color: #dde4ec; min-height: 84px; }
+:root[data-theme='aero-classic'] .month-cell:hover { background: #f2f8fe; }
+:root[data-theme='aero-classic'] .month-cell.outside { background: #f6f6f6; }
+:root[data-theme='aero-classic'] .month-cell.outside .day-num { color: #a0a0a0; }
+:root[data-theme='aero-classic'] .month-cell.selected { background: var(--w7-sel); }
+:root[data-theme='aero-classic'] .month-cell.selected::after { border: 1px solid #7da2ce; box-shadow: inset 0 0 0 1px #ebf4fd; }
+:root[data-theme='aero-classic'] .day-num { font-weight: 400; color: #1e1e1e; border-radius: 0; height: 18px; min-width: 18px; }
+:root[data-theme='aero-classic'] :is(.day-num.today, .week-day.today .dn) {
+  color: #fff;
+  border-radius: 2px;
+  background: linear-gradient(#5aa7f0, #2b7ed8 50%, #1b67c2 50%, #3a8ee6);
+  box-shadow: inset 0 0 0 1px #ffffff66, 0 0 0 1px #1a5aa6;
+  text-shadow: 0 -1px 0 #0004;
+}
+:root[data-theme='aero-classic'] .week-day .wd { font-weight: 400; text-transform: none; letter-spacing: 0; color: #444; }
+:root[data-theme='aero-classic'] .week-day .dn { font-weight: 400; font-size: 15px; color: #000; width: auto; min-width: 26px; height: 22px; padding: 0 4px; }
+:root[data-theme='aero-classic'] .week-day.today .wd { color: var(--w7-title); }
+:root[data-theme='aero-classic'] .week-body { background: #fff; }
+:root[data-theme='aero-classic'] .hour-line { border-top-color: #e6ebf1; }
+:root[data-theme='aero-classic'] .week-col { border-left-color: #dde4ec; }
+:root[data-theme='aero-classic'] .allday-cell { border-left-color: #dde4ec; }
+:root[data-theme='aero-classic'] .now-line { border-top-color: #f0a30a; }
+:root[data-theme='aero-classic'] .now-line::before { background: #f0a30a; }
+
+/* Outlook 2007 style glossy appointments */
+:root[data-theme='aero-classic'] .chip, :root[data-theme='aero-classic'] .block {
+  border: 1px solid color-mix(in srgb, var(--ev) 70%, #000);
+  border-radius: 3px;
+  color: #000;
+  background: linear-gradient(color-mix(in srgb, var(--ev-2) 55%, #fff), color-mix(in srgb, var(--ev-2) 80%, #fff) 50%, color-mix(in srgb, var(--ev) 55%, #fff) 50%, color-mix(in srgb, var(--ev) 45%, #fff));
+  box-shadow: inset 0 0 0 1px #ffffff80;
+  text-shadow: none;
+  font-weight: 400;
+  backdrop-filter: none;
+}
+:root[data-theme='aero-classic'] .chip.solid {
+  color: #fff;
+  background: linear-gradient(var(--ev-2), var(--ev) 50%, color-mix(in srgb, var(--ev) 80%, #000) 50%, var(--ev));
+  text-shadow: 0 1px 1px #0005;
+}
+:root[data-theme='aero-classic'] .chip-title, :root[data-theme='aero-classic'] .block-title { font-weight: 600; }
+:root[data-theme='aero-classic'] .block { border-left-width: 1px; }
+:root[data-theme='aero-classic'] .dot { border-radius: 50%; background: radial-gradient(circle at 40% 30%, #fff 0 15%, var(--ev) 55%); width: 7px; height: 7px; }
+
+/* Day agenda as a Vista Sidebar gadget */
+:root[data-theme='aero-classic'] .agenda {
+  position: relative;
+  width: 250px;
+  padding: 10px;
+  border-radius: 9px;
+  border: 1px solid #000;
+  color: #fff;
+  background:
+    linear-gradient(#ffffff38, #ffffff0a 40%, #ffffff00 40%),
+    linear-gradient(#3c4250, #14171d 60%, #0b0c10);
+  box-shadow: 0 3px 10px #000a, inset 0 0 0 1px #ffffff40;
+  backdrop-filter: none;
+  align-self: flex-start;
+  max-height: 100%;
+}
+:root[data-theme='aero-classic'] .agenda-head { align-items: center; padding-bottom: 8px; border-bottom: 1px solid #ffffff26; }
+:root[data-theme='aero-classic'] .agenda-weekday { color: #9fd9ff; font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 12px; }
+:root[data-theme='aero-classic'] .agenda-date { color: #fff; font-weight: 300; font-size: 22px; text-shadow: 0 1px 3px #000; }
+:root[data-theme='aero-classic'] .agenda .icon-btn.primary {
+  width: 26px; height: 26px; min-height: 0;
+  border-radius: 50%;
+  color: #fff; font-weight: 700; font-size: 16px;
+  border: 1px solid #0a3d00;
+  background: radial-gradient(ellipse 70% 45% at 50% 20%, #ffffffcc, #fff0 70%), radial-gradient(circle at 50% 100%, #b6ff6a, #3cb514 55%, #1d6b05);
+  box-shadow: 0 1px 3px #000a;
+  text-shadow: 0 1px 1px #0008;
+  animation: none;
+}
+:root[data-theme='aero-classic'] .agenda-empty { color: #c7ccd6; }
+:root[data-theme='aero-classic'] .agenda .link-btn { color: #9fd9ff; }
+:root[data-theme='aero-classic'] .agenda-item {
+  border-radius: 4px;
+  border: 1px solid #ffffff1f;
+  background: linear-gradient(#ffffff1f, #ffffff0a 50%, #ffffff00 50%, #ffffff0d);
+  box-shadow: none;
+  padding: 6px 8px;
+  color: #fff;
+}
+:root[data-theme='aero-classic'] .agenda-item:hover { border-color: #ffffff59; background: linear-gradient(#ffffff38, #ffffff14 50%, #ffffff0a 50%, #ffffff1f); filter: none; }
+:root[data-theme='aero-classic'] .agenda-bar { width: 4px; border-radius: 2px; background: linear-gradient(var(--ev-2), var(--ev)); box-shadow: 0 0 6px var(--ev); }
+:root[data-theme='aero-classic'] .agenda-title { color: #fff; font-weight: 600; }
+:root[data-theme='aero-classic'] .agenda-meta { color: color-mix(in srgb, var(--ev-2) 70%, #fff); font-weight: 400; }
+:root[data-theme='aero-classic'] .agenda-desc { color: #b9c0cc; }
+
+/* ---------- Event dialog as a Win7 dialog window ---------- */
+:root[data-theme='aero-classic'] .event-dialog {
+  width: min(430px, calc(100vw - 16px));
+  border: 1px solid #000000b3;
+  border-radius: 7px;
+  padding: 0 7px 7px;
+  background: rgb(69 128 196 / 0.6);
+  background-image: var(--w7-glass);
+  background-attachment: fixed;
+  box-shadow: 2px 2px 14px 2px #000c, inset 0 0 0 1px #fffa;
+  backdrop-filter: blur(8px);
+  overflow: visible;
+  animation: none;
+}
+:root[data-theme='aero-classic'] .event-dialog::backdrop { background: transparent; backdrop-filter: none; }
+:root[data-theme='aero-classic'] .event-dialog form {
+  background: #f0f0f0;
+  border: 1px solid #000000b3;
+  box-shadow: 0 0 0 1px #fff9;
+  padding: 0 12px 12px;
+  gap: 9px;
+}
+:root[data-theme='aero-classic'] .event-dialog .win-title { display: flex; margin: 0 -19px 0; padding: 0 0 0 8px; background: none; position: relative; top: 0; }
+:root[data-theme='aero-classic'] .event-dialog form { margin-top: 28px; }
+:root[data-theme='aero-classic'] .event-dialog .win-title { position: absolute; left: 7px; right: 7px; top: 0; margin: 0; }
+:root[data-theme='aero-classic'] .event-dialog .dialog-accent { display: none; }
+:root[data-theme='aero-classic'] .when-label, :root[data-theme='aero-classic'] .field-label { font-weight: 400; color: #000; font-size: 12px; }
+:root[data-theme='aero-classic'] .swatch { width: 20px; height: 20px; border: 1px solid #fff; box-shadow: 0 0 0 1px #8e8f8f; background: radial-gradient(circle at 50% 25%, #ffffffd9 0 18%, #fff0 45%), var(--ev); }
+:root[data-theme='aero-classic'] .swatch.on { box-shadow: 0 0 0 2px #3399ff, 0 0 6px #3399ff; }
+:root[data-theme='aero-classic'] .hint { color: #555; font-size: 12px; }
+:root[data-theme='aero-classic'] .dialog-actions {
+  margin: 4px -12px -12px;
+  padding: 10px 12px;
+  border-top: 1px solid #dfdfdf;
+  background: #f0f0f0;
+  box-shadow: inset 0 1px 0 #fff;
+}
+:root[data-theme='aero-classic'] .dialog-actions button { min-width: 75px; }
+
+/* ---------- Sign-in as a Windows 7 logon screen ---------- */
+:root[data-theme='aero-classic'] .signin { background: transparent; }
+:root[data-theme='aero-classic'] .signin-card {
+  color: #fff;
+  padding: 1.5rem 1.5rem 1.25rem;
+  border-radius: 8px;
+  border: 1px solid #ffffff59;
+  background: radial-gradient(ellipse 120% 80% at 50% 0%, #2f7fd0b3, #0a2a5ccc 70%);
+  box-shadow: 0 8px 30px #0007, inset 0 0 0 1px #ffffff26;
+  backdrop-filter: blur(10px);
+  gap: 10px;
+}
+:root[data-theme='aero-classic'] .signin-card h1 { color: #fff; font: 300 26px 'Segoe UI', 'Noto Sans', sans-serif; text-shadow: 0 1px 6px #000a; }
+:root[data-theme='aero-classic'] .signin-card p { color: #fff; text-shadow: 0 1px 4px #000c; }
+:root[data-theme='aero-classic'] .signin .logo {
+  width: 110px; height: 110px;
+  border-radius: 10px;
+  font-size: 46px;
+  border: 1px solid #fffa;
+  background:
+    linear-gradient(#ffffffa6, #ffffff33 50%, #ffffff1a 50%, #ffffff59);
+  box-shadow: 0 4px 16px #0008, inset 0 0 0 1px #fff6;
+  color: transparent;
+  position: relative;
+}
+:root[data-theme='aero-classic'] .signin .logo::after {
+  content: '';
+  position: absolute; inset: 8px;
+  border-radius: 4px;
+  background: url('/aero/calendar.svg') center / 70% no-repeat, radial-gradient(circle at 50% 25%, #ffffffb3, #fff0 55%), linear-gradient(160deg, #7ad94f, #1f8fd6);
+}
+:root[data-theme='aero-classic'] .signin-card button { min-height: 30px; }
+
+/* ---------- Phones ---------- */
+@media (max-width: 760px) {
+  :root[data-theme='aero-classic'] { font-size: 13px; }
+  :root[data-theme='aero-classic'] .desktop-area { padding: 6px 6px 8px; }
+  :root[data-theme='aero-classic'] .cal-window { height: auto; min-height: 0; }
+  :root[data-theme='aero-classic'] .win-title { min-height: 26px; }
+  :root[data-theme='aero-classic'] .win-btn { width: 22px; }
+  :root[data-theme='aero-classic'] .win-btn.close { width: 36px; }
+  :root[data-theme='aero-classic'] .cal-toolbar { padding: 6px; }
+  :root[data-theme='aero-classic'] .cal-title { font-size: 16px; }
+  :root[data-theme='aero-classic'] .cal-body { padding: 6px; }
+  :root[data-theme='aero-classic'] .month-cell { min-height: 46px; }
+  :root[data-theme='aero-classic'] .month-cell.selected { background: none; }
+  :root[data-theme='aero-classic'] .month-cell.selected .day-num:not(.today) { background: var(--w7-sel); color: #000; box-shadow: 0 0 0 1px #7da2ce; border-radius: 2px; }
+  :root[data-theme='aero-classic'] .cal-desktop { flex-direction: column; gap: 8px; height: auto; }
+  :root[data-theme='aero-classic'] .cal-desktop > .agenda { width: auto; align-self: stretch; margin: 0; }
+  :root[data-theme='aero-classic'] button.fab {
+    display: grid;
+    bottom: calc(52px + env(safe-area-inset-bottom));
+    right: 14px;
+    width: 52px; height: 52px; min-height: 0;
+    border-radius: 50%;
+    font-size: 26px; font-weight: 700; color: #fff;
+    border: 1px solid #0a3d00;
+    background: radial-gradient(ellipse 70% 45% at 50% 18%, #ffffffd9, #fff0 70%), radial-gradient(circle at 50% 100%, #c2ff7a, #3cb514 55%, #1d6b05);
+    box-shadow: 0 3px 8px #000a;
+    text-shadow: 0 1px 2px #0008;
+    animation: none;
+  }
+  :root[data-theme='aero-classic'] .taskbar { padding-left: 54px; padding-bottom: env(safe-area-inset-bottom); height: calc(44px + env(safe-area-inset-bottom)); }
+  :root[data-theme='aero-classic'] .task-btn { width: 52px; }
+  :root[data-theme='aero-classic'] .start-menu { width: calc(100vw - 16px); flex-direction: column; gap: 8px; }
+  :root[data-theme='aero-classic'] .start-left { min-height: 0; }
+  :root[data-theme='aero-classic'] .start-right { width: auto; padding: 4px; }
+  :root[data-theme='aero-classic'] .user-tile { display: none; }
+  :root[data-theme='aero-classic'] .shutdown { align-self: stretch; margin-top: 8px; }
+  :root[data-theme='aero-classic'] .event-dialog { margin: auto; }
+}
+
+:root[data-theme='aero-classic'] .page-window { max-width: 640px; margin: 40px auto 0; }
+:root[data-theme='aero-classic'] .page-window .placeholder { padding: 2rem; color: #333; }

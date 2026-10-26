@@ -8,6 +8,8 @@ import EventDialog from './EventDialog'
 import { useEvents } from './useEvents'
 import { createEvent, deleteEvent, updateEvent } from './api'
 import type { CalendarEvent, EventInput, Occurrence } from './types'
+import Window from '../../components/Window'
+import { useTheme } from '../../lib/theme'
 import './calendar.css'
 
 type View = 'month' | 'week'
@@ -18,6 +20,8 @@ export default function CalendarPage() {
   const [cursor, setCursor] = useState(() => startOfDay(new Date()))
   const [selected, setSelected] = useState(() => startOfDay(new Date()))
   const [dialog, setDialog] = useState<DialogTarget>(null)
+  // Classic shows the day agenda as a desktop gadget beside the window
+  const gadget = useTheme() === 'aero-classic'
 
   const range = view === 'month' ? monthGridRange(cursor) : weekRange(cursor)
   const { occurrences, loading, error, reload } = useEvents(range.start, range.end)
@@ -63,75 +67,83 @@ export default function CalendarPage() {
       ? format(cursor, 'MMMM yyyy')
       : `${format(range.start, 'd MMM')} – ${format(new Date(range.end.getTime() - 1), 'd MMM yyyy')}`
 
+  const agenda = (
+    <DayAgenda
+      day={selected}
+      occurrences={occurrences}
+      onAdd={() => openNew(defaultStartOn(selected))}
+      onOpen={openExisting}
+    />
+  )
+
   return (
-    <div className="calendar">
-      <div className="cal-toolbar">
-        <h1 className="cal-title">{title}</h1>
-        <div className="cal-controls">
-          <div className="segmented" role="tablist">
-            {(['month', 'week'] as View[]).map((v) => (
-              <button key={v} role="tab" aria-selected={view === v} onClick={() => setView(v)}>
-                {v === 'month' ? 'Month' : 'Week'}
+    <div className="cal-desktop">
+      <Window title="Calendar - My To-do" icon="calendar" className="cal-window">
+        <div className="calendar">
+          <div className="cal-toolbar">
+            <h1 className="cal-title">{title}</h1>
+            <div className="cal-controls">
+              <div className="segmented" role="tablist">
+                {(['month', 'week'] as View[]).map((v) => (
+                  <button key={v} role="tab" aria-selected={view === v} onClick={() => setView(v)}>
+                    {v === 'month' ? 'Month' : 'Week'}
+                  </button>
+                ))}
+              </div>
+              <div className="nav-group">
+                <button className="icon-btn" onClick={() => step(-1)} aria-label="Previous">
+                  ‹
+                </button>
+                <button onClick={goToday}>Today</button>
+                <button className="icon-btn" onClick={() => step(1)} aria-label="Next">
+                  ›
+                </button>
+              </div>
+              <button className="primary new-btn" onClick={() => openNew(defaultStartOn(selected))}>
+                + New event
               </button>
-            ))}
+            </div>
           </div>
-          <div className="nav-group">
-            <button className="icon-btn" onClick={() => step(-1)} aria-label="Previous">
-              ‹
-            </button>
-            <button onClick={goToday}>Today</button>
-            <button className="icon-btn" onClick={() => step(1)} aria-label="Next">
-              ›
-            </button>
+
+          {error && (
+            <div className="banner">
+              Couldn't load your calendar: {error} <button onClick={reload}>Retry</button>
+            </div>
+          )}
+
+          <div className={`cal-body view-${view} ${loading ? 'loading' : ''}`}>
+            {view === 'month' ? (
+              <>
+                <MonthView
+                  month={cursor}
+                  selected={selected}
+                  occurrences={occurrences}
+                  onSelectDay={setSelected}
+                  onAddOnDay={(d) => openNew(defaultStartOn(d))}
+                  onOpen={openExisting}
+                />
+                {!gadget && agenda}
+              </>
+            ) : (
+              <WeekView week={cursor} occurrences={occurrences} onAddAt={(d) => openNew(d)} onOpen={openExisting} />
+            )}
           </div>
-          <button className="primary new-btn" onClick={() => openNew(defaultStartOn(selected))}>
-            + New event
-          </button>
-        </div>
-      </div>
 
-      {error && (
-        <div className="banner">
-          Couldn't load your calendar: {error} <button onClick={reload}>Retry</button>
-        </div>
-      )}
-
-      <div className={`cal-body view-${view} ${loading ? 'loading' : ''}`}>
-        {view === 'month' ? (
-          <>
-            <MonthView
-              month={cursor}
-              selected={selected}
-              occurrences={occurrences}
-              onSelectDay={setSelected}
-              onAddOnDay={(d) => openNew(defaultStartOn(d))}
-              onOpen={openExisting}
+          {dialog && (
+            <EventDialog
+              key={'event' in dialog ? dialog.event.id : dialog.start.toISOString()}
+              target={dialog}
+              onSave={save}
+              onDelete={remove}
+              onClose={() => setDialog(null)}
             />
-            <DayAgenda
-              day={selected}
-              occurrences={occurrences}
-              onAdd={() => openNew(defaultStartOn(selected))}
-              onOpen={openExisting}
-            />
-          </>
-        ) : (
-          <WeekView week={cursor} occurrences={occurrences} onAddAt={(d) => openNew(d)} onOpen={openExisting} />
-        )}
-      </div>
-
+          )}
+        </div>
+      </Window>
+      {gadget && view === 'month' && agenda}
       <button className="fab primary" onClick={() => openNew(defaultStartOn(selected))} aria-label="New event">
         +
       </button>
-
-      {dialog && (
-        <EventDialog
-          key={'event' in dialog ? dialog.event.id : dialog.start.toISOString()}
-          target={dialog}
-          onSave={save}
-          onDelete={remove}
-          onClose={() => setDialog(null)}
-        />
-      )}
     </div>
   )
 }
