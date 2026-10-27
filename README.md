@@ -20,3 +20,7 @@ npm run dev                  # http://localhost:5173/my-todo-app/
 6. Sign in once with each provider, check they map to one user, then turn off "Allow new users to sign up".
 
 Never commit the `service_role` key or the database password.
+
+## Budget
+
+Run `supabase/migrations/003_budget.sql` in the Supabase SQL Editor once. It adds `transactions` (money in and out) and `budgets` (a monthly limit per spending category), both private to their owner and synced live. Amounts accept shorthand like `45k` or `1.5m`, and the currency is picked on the Budget page (remembered per device).

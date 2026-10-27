@@ -1,0 +1,123 @@
+.budget { display: flex; gap: 1rem; flex: 1; min-height: 0; padding: 1.25rem 1.5rem; }
+.budget { --income: #16a34a; --expense: #e5484d; }
+
+.budget-side,
+.budget-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  min-height: 0;
+}
+
+/* Month, totals and category budgets */
+.budget-side { width: 300px; flex: none; display: flex; flex-direction: column; gap: 0.7rem; padding: 1rem; overflow: auto; align-self: flex-start; max-height: 100%; }
+.month-switch { display: flex; align-items: center; gap: 0.4rem; }
+.month-switch .cal-title { flex: 1; min-width: 0; text-align: center; font-size: 1.2rem; }
+.this-month { align-self: center; font-size: 0.82rem; }
+
+.budget-totals { display: flex; flex-direction: column; gap: 0.3rem; margin: 0; }
+.bt { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; background: var(--surface-2); border-radius: 10px; padding: 0.45rem 0.7rem; min-width: 0; }
+.bt dt { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.bt dd { margin: 0; font-weight: 800; font-size: 1rem; color: var(--text-h); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.bt.income dd { color: var(--income); }
+.bt.spent dd { color: var(--expense); }
+.bt.net.negative dd { color: var(--danger); }
+
+.budget-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; margin-top: 0.3rem; }
+.budget-head h2 { font-size: 0.85rem; font-weight: 700; color: var(--muted); letter-spacing: 0; }
+.budget-head .link-btn { font-size: 0.82rem; }
+
+.limit-lines { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.limit-lines li { position: relative; }
+.limit-line { display: flex; flex-direction: column; gap: 0.25rem; padding: 0.45rem 0.55rem; border-radius: 10px; }
+.budget button.limit-line {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--text-h);
+  font-weight: 600;
+  padding-right: 5.2rem;
+}
+.budget button.limit-line:hover { background: var(--surface-2); }
+.budget button.limit-line[aria-pressed='true'] { background: var(--accent-soft); }
+.limit-line.total { background: var(--surface-2); }
+.limit-line.total .ll-name { flex: none; }
+.limit-line.total .ll-amount { flex: 1; text-align: right; }
+.ll-row { display: flex; gap: 0.5rem; align-items: baseline; }
+.ll-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ll-amount { font-variant-numeric: tabular-nums; font-size: 0.88rem; }
+.ll-left { font-size: 0.75rem; color: var(--muted); font-weight: 600; }
+.limit-line.over .ll-left { color: var(--danger); }
+.ll-edit { position: absolute; right: 0.55rem; top: 0.5rem; font-size: 0.75rem; }
+.budget button.limit-line .ll-amount { margin-right: 0; }
+
+.meter { display: block; height: 7px; border-radius: 999px; background: color-mix(in srgb, var(--border) 80%, transparent); overflow: hidden; }
+.meter > span { display: block; height: 100%; border-radius: inherit; background: var(--accent); transition: width 0.3s; }
+.limit-line.over .meter > span { background: var(--danger); }
+
+.currency-pick { display: flex; align-items: center; gap: 0.5rem; margin-top: auto; padding-top: 0.6rem; border-top: 1px solid var(--border); font-size: 0.82rem; color: var(--muted); font-weight: 600; }
+.currency-pick select { font: inherit; color: var(--text-h); background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 0.2rem 0.4rem; }
+
+/* Entries */
+.budget-panel { flex: 1; min-width: 0; overflow: auto; padding: 1.1rem 1.25rem 1.5rem; }
+.money-add { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+.money-add :is(input, select) {
+  font: inherit;
+  min-width: 0;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-h);
+}
+.money-add :is(input, select):focus { outline: 2px solid var(--accent); outline-offset: 0; background: var(--surface); }
+.money-add .ma-amount { width: 11rem; font-variant-numeric: tabular-nums; }
+.money-add .ma-note { flex: 1; min-width: 8rem; }
+.money-add .segmented { align-self: center; }
+.budget-dialog .segmented { align-self: flex-start; }
+
+.budget-filter { display: flex; gap: 0.5rem; align-items: baseline; margin-bottom: 0.6rem; color: var(--muted); font-size: 0.9rem; }
+.budget-empty { color: var(--muted); text-align: center; padding: 2rem 0; }
+.budget-empty.small { padding: 0.5rem 0; margin: 0; font-size: 0.88rem; }
+
+.money-day + .money-day { margin-top: 1rem; }
+.money-day-head { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; color: var(--muted); margin: 0 0 0.3rem; letter-spacing: 0; }
+.money-day-head .neg, .money-day-head .pos { font-variant-numeric: tabular-nums; }
+.money-list { list-style: none; margin: 0; padding: 0; }
+.money-list li { border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent); }
+.money-list li:last-child { border-bottom: 0; }
+.budget button.money-row {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  text-align: left;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  padding: 0.55rem 0.4rem;
+  border-radius: 8px;
+  color: var(--text-h);
+  font-weight: 500;
+}
+.budget button.money-row:hover { background: color-mix(in srgb, var(--surface-2) 70%, transparent); }
+.mr-cat { flex: none; font-weight: 700; min-width: 6.5rem; }
+.mr-note { flex: 1; min-width: 0; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mr-amount { flex: none; font-weight: 700; font-variant-numeric: tabular-nums; }
+.money-row.expense .mr-amount { color: var(--expense); }
+.money-row.income .mr-amount { color: var(--income); }
+
+@media (max-width: 760px) {
+  .budget { flex-direction: column; padding: 0.75rem; gap: 0.6rem; overflow: auto; }
+  .budget-side { width: auto; flex: none; align-self: stretch; max-height: none; overflow: visible; }
+  .budget-panel { flex: none; overflow: visible; padding: 0.9rem; }
+  .money-add .segmented { flex-basis: 100%; }
+  .money-add .segmented button { flex: 1; }
+  .money-add .ma-amount { flex: 1 1 40%; width: auto; }
+  .money-add select { flex: 1 1 30%; }
+  .money-add .ma-note { flex: 1 1 60%; }
+  .mr-cat { min-width: 0; }
+}
