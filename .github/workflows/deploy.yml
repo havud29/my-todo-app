@@ -7,15 +7,42 @@ concurrency: { group: pages, cancel-in-progress: true }
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SET_URL: ${{ vars.VITE_SUPABASE_URL }}
+      SET_KEY: ${{ vars.VITE_SUPABASE_KEY }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
+
+      # The app needs the project URL and its public (anon) key at build time.
+      # Without the VITE_ variables, work them out from the project ref and
+      # the access token that the migrations workflow already uses.
+      - name: Find the Supabase URL and public key
+        run: |
+          url="$SET_URL"
+          key="$SET_KEY"
+          if [ -z "$url" ] && [ -n "$SUPABASE_PROJECT_REF" ]; then
+            url="https://$SUPABASE_PROJECT_REF.supabase.co"
+          fi
+          if [ -z "$key" ] && [ -n "$SUPABASE_PROJECT_REF" ] && [ -n "$SUPABASE_ACCESS_TOKEN" ]; then
+            # Only the anon or publishable key, which is public and ships in
+            # the site anyway; never service_role or a secret key
+            key=$(curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+              "https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_REF/api-keys" \
+              | jq -r '([.[] | select(.name == "anon")][0].api_key) // ([.[] | select(.type == "publishable")][0].api_key) // empty')
+          fi
+          if [ -z "$url" ] || [ -z "$key" ]; then
+            echo "::error::The site needs the Supabase URL and public key. Add the SUPABASE_PROJECT_REF variable and SUPABASE_ACCESS_TOKEN secret, or the VITE_SUPABASE_URL and VITE_SUPABASE_KEY variables (see README)."
+            exit 1
+          fi
+          echo "VITE_SUPABASE_URL=$url" >> "$GITHUB_ENV"
+          echo "VITE_SUPABASE_KEY=$key" >> "$GITHUB_ENV"
+
       - run: npm ci
       - run: npm run build
-        env:
-          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_KEY: ${{ vars.VITE_SUPABASE_KEY }}
       - uses: actions/upload-pages-artifact@v3
         with: { path: dist }
   deploy:
