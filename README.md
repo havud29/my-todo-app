@@ -31,6 +31,8 @@ One-time setup:
    - *By hand:* Edge Functions → Deploy a new function → Via editor, name it `mcp`, paste `supabase/functions/mcp/index.ts`, turn off "Verify JWT", and deploy.
 3. **Connect Claude:** in the app, open the **Claude** button → *Make link*. In Claude, go to Settings → Connectors → *Add custom connector*, name it *My To-do* and paste the link.
 
+If Claude says it "couldn't register with the sign-in service" or asks for an OAuth Client ID, the function is answering 401: turn off JWT verification for `mcp` (Edge Functions → mcp → Details) and add the connector again. No Client ID is needed. Opening the link in a browser should say the connector is running.
+
 The link ends in a private token; only its hash is stored. Anyone with the link can use your data, so keep it private, and remove it from the Claude panel if it leaks. The function uses the `service_role` key that Supabase provides to Edge Functions, and limits every query to the link's owner.
 
 Never commit the `service_role` key or the database password.
