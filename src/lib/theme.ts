@@ -1,10 +1,11 @@
 import { useSyncExternalStore } from 'react'
 
-export type Theme = 'aero-classic' | 'aero-glossy' | 'aero-modern'
+export type Theme = 'aero-classic' | 'aero-glossy' | 'aero-modern' | 'metro'
 export const themes: { id: Theme; label: string }[] = [
   { id: 'aero-classic', label: 'Classic' },
   { id: 'aero-glossy', label: 'Glossy' },
   { id: 'aero-modern', label: 'Modern' },
+  { id: 'metro', label: 'Windows Phone' },
 ]
 
 const key = 'theme'
