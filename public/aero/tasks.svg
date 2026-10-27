@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="board" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e7b77a"/><stop offset="1" stop-color="#b07436"/></linearGradient>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eef2f6"/></linearGradient>
+    <linearGradient id="clip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3f6f9"/><stop offset=".5" stop-color="#b6c0cb"/><stop offset=".51" stop-color="#8f9aa6"/><stop offset="1" stop-color="#c9d1da"/></linearGradient>
+    <radialGradient id="check" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#b9ff7a"/><stop offset=".55" stop-color="#3fbf14"/><stop offset="1" stop-color="#1d7d06"/></radialGradient>
+  </defs>
+  <rect x="8" y="6" width="32" height="40" rx="3" fill="#000" opacity=".18" transform="translate(1 2)"/>
+  <rect x="8" y="6" width="32" height="40" rx="3" fill="url(#board)" stroke="#7c4f1f"/>
+  <rect x="12" y="11" width="24" height="31" rx="1" fill="url(#paper)" stroke="#9aa5b1"/>
+  <g stroke="#b9c3ce" stroke-width="1.6" stroke-linecap="round"><path d="M22 19h10M22 26h10M22 33h7"/></g>
+  <g fill="none" stroke="#9aa5b1"><rect x="15" y="16" width="5" height="5" rx="1"/><rect x="15" y="23" width="5" height="5" rx="1"/><rect x="15" y="30" width="5" height="5" rx="1"/></g>
+  <path d="M17 33l6 7 17-22-4-3-13 16-3-3z" fill="url(#check)" stroke="#16610a" stroke-linejoin="round"/>
+  <path d="M19 33.5l4 4.5 14-18" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1.2"/>
+  <rect x="17" y="3" width="14" height="7" rx="2" fill="url(#clip)" stroke="#5d6772"/>
+</svg>

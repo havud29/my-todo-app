@@ -12,11 +12,16 @@ export default function SignIn() {
 
   return (
     <main className="signin">
-      <h1>My To-do App</h1>
-      <p>Notes, calendar and tasks in one place.</p>
-      <button onClick={() => go('google')}>Sign in with Google</button>
-      <button onClick={() => go('github')}>Sign in with GitHub</button>
-      {error && <p className="error">{error}</p>}
+      <div className="signin-card">
+        <span className="logo" aria-hidden>
+          ✦
+        </span>
+        <h1>My To-do App</h1>
+        <p>Plan your work on a calendar, keep tasks and notes in one place.</p>
+        <button onClick={() => go('google')}>Continue with Google</button>
+        <button onClick={() => go('github')}>Continue with GitHub</button>
+        {error && <p className="error">{error}</p>}
+      </div>
     </main>
   )
 }
