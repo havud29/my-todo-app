@@ -8,6 +8,7 @@ import { useTheme } from './lib/theme'
 import NotesPage from './features/notes/NotesPage'
 import CalendarPage from './features/calendar/CalendarPage'
 import TasksPage from './features/tasks/TasksPage'
+import Assistant from './features/assistant/Assistant'
 
 const tabs: { route: Route; label: string; icon: string }[] = [
   { route: 'calendar', label: 'Calendar', icon: '◷' },
@@ -33,9 +34,12 @@ export default function App() {
 
   if (theme === 'aero-classic') {
     return (
-      <ClassicShell session={session} route={route}>
-        {page}
-      </ClassicShell>
+      <>
+        <ClassicShell session={session} route={route}>
+          {page}
+        </ClassicShell>
+        <Assistant />
+      </>
     )
   }
 
@@ -69,6 +73,7 @@ export default function App() {
         {links}
         <ThemeSwitch compact />
       </nav>
+      <Assistant />
     </div>
   )
 }
