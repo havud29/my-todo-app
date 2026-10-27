@@ -6,9 +6,9 @@ export const supabase = createClient(
   { auth: { flowType: 'pkce', persistSession: true, detectSessionInUrl: true } },
 )
 
-export const signIn = (provider: 'google' | 'github') =>
+export const signIn = () =>
   supabase.auth.signInWithOAuth({
-    provider,
+    provider: 'github',
     options: { redirectTo: window.location.origin + import.meta.env.BASE_URL },
   })
 
