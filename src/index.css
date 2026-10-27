@@ -190,7 +190,8 @@ button.primary:hover { filter: brightness(1.06); }
     border-top: 1px solid var(--border);
     z-index: 20;
   }
-  .tabbar a { flex: 1; flex-direction: column; justify-content: center; gap: 2px; font-size: 0.72rem; padding: 0; }
+  .tabbar { overflow-x: auto; scrollbar-width: none; }
+  .tabbar a { flex: 1 0 auto; min-width: 62px; flex-direction: column; justify-content: center; gap: 2px; font-size: 0.72rem; padding: 0; }
   .tabbar a[aria-current='page'] { color: var(--accent); }
 }
 

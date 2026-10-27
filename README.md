@@ -12,7 +12,7 @@ npm run dev                  # http://localhost:5173/my-todo-app/
 
 ## One-time setup (Phase 1)
 
-1. **Supabase:** create a project, then run `supabase/migrations/001_init.sql` in the SQL Editor.
+1. **Supabase:** create a project, then run each file in `supabase/migrations/` in order (`001_init.sql`, then `002_milestones.sql`, …) in the SQL Editor.
 2. **GitHub OAuth app:** Settings → Developer settings → OAuth Apps → New. Homepage `https://havud29.github.io/my-todo-app/`, callback `https://<project-ref>.supabase.co/auth/v1/callback`. Paste the Client ID and Secret into Supabase → Authentication → Sign In / Providers → GitHub.
 3. **Google OAuth client:** in Google Cloud Console, set the consent screen to External / Testing with yourself as test user. Create a Web OAuth client with JavaScript origins `https://havud29.github.io` and `http://localhost:5173`, and the Supabase callback above as redirect URI. Paste the ID and Secret into Supabase → Providers → Google.
 4. **Supabase URL settings** (Authentication → URL Configuration): Site URL `https://havud29.github.io/my-todo-app/`, plus redirect URL `http://localhost:5173/**`.

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="hill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9be36a"/><stop offset="1" stop-color="#3f9a1c"/></linearGradient>
+    <linearGradient id="pole" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f3f6f9"/><stop offset=".5" stop-color="#b6c0cb"/><stop offset="1" stop-color="#7d8894"/></linearGradient>
+    <linearGradient id="flag" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff8a7a"/><stop offset=".6" stop-color="#e3261b"/><stop offset="1" stop-color="#a1130c"/></linearGradient>
+  </defs>
+  <ellipse cx="24" cy="43" rx="19" ry="3" fill="#000" opacity=".18"/>
+  <path d="M4 42 C12 30 20 26 26 26 C33 26 40 32 44 42Z" fill="url(#hill)" stroke="#2c6e12"/>
+  <path d="M9 37 C15 31 20 29 25 29" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.5"/>
+  <rect x="24" y="6" width="3" height="22" rx="1" fill="url(#pole)" stroke="#5d6772" stroke-width=".8"/>
+  <path d="M27 7 C33 5 36 10 43 8 L41 15 L43 21 C36 23 33 18 27 20Z" fill="url(#flag)" stroke="#7d0e08" stroke-linejoin="round"/>
+  <path d="M28 9 C33 7.5 35 11 40 10" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.2"/>
+  <circle cx="25.5" cy="5.5" r="2.4" fill="#ffd34d" stroke="#a87b1e"/>
+</svg>

@@ -9,6 +9,8 @@ import { useTheme } from './lib/theme'
 import NotesPage from './features/notes/NotesPage'
 import CalendarPage from './features/calendar/CalendarPage'
 import TasksPage from './features/tasks/TasksPage'
+import MilestonesPage from './features/milestones/MilestonesPage'
+import TimelinePage from './features/timeline/TimelinePage'
 
 
 export default function App() {
@@ -24,6 +26,8 @@ export default function App() {
       {route === 'calendar' && <CalendarPage />}
       {route === 'tasks' && <TasksPage />}
       {route === 'notes' && <NotesPage />}
+      {route === 'milestones' && <MilestonesPage />}
+      {route === 'timeline' && <TimelinePage />}
     </>
   )
 

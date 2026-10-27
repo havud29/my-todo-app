@@ -1,0 +1,76 @@
+.milestones { flex: 1; min-height: 0; overflow: auto; padding: 1.25rem 1.5rem 2rem; display: flex; flex-direction: column; gap: 1rem; }
+.ms-head { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.ms-head .cal-title { flex: 1; }
+.ms-empty { color: var(--muted); text-align: center; padding: 2rem 1rem; background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius); }
+
+.ms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; align-items: start; }
+.ms-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem 1.1rem 1.1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--ev);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+.ms-card-head { display: flex; align-items: flex-start; gap: 0.75rem; }
+.ms-emoji {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--ev) 16%, transparent);
+}
+.ms-card-titles { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ms-title { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.ms-when { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+.ms-when.overdue { color: var(--danger); }
+.milestones button.ms-edit { width: 32px; height: 32px; font-size: 1.1rem; }
+.ms-desc { margin: 0; color: var(--text); font-size: 0.9rem; white-space: pre-wrap; }
+
+.ms-progress { height: 10px; border-radius: 999px; background: color-mix(in srgb, var(--ev) 14%, var(--surface-2)); overflow: hidden; }
+.ms-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--ev) 70%, #fff), var(--ev));
+  transition: width 0.3s;
+}
+.ms-progress-label { font-size: 0.78rem; font-weight: 700; color: var(--muted); margin-top: -0.3rem; }
+
+.ms-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.ms-steps label { display: flex; align-items: flex-start; gap: 0.55rem; padding: 0.3rem 0.2rem; border-radius: 8px; cursor: pointer; font-size: 0.92rem; }
+.ms-steps label:hover { background: var(--surface-2); }
+.ms-steps input { accent-color: var(--ev); width: 17px; height: 17px; margin: 0.15rem 0 0; flex: none; }
+.ms-steps .done span { text-decoration: line-through; color: var(--muted); }
+.ms-add-step input {
+  width: 100%;
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  border: 1px dashed var(--border);
+  background: none;
+  color: var(--text-h);
+}
+.ms-add-step input:focus { border-style: solid; outline: 2px solid var(--ev); outline-offset: -1px; }
+.milestones button.ms-achieve { align-self: flex-start; }
+
+.ms-achieved ul { list-style: none; margin: 0.5rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+.ms-trophy { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.75rem; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--ev); border-radius: 12px; }
+.ms-trophy-title { flex: 1; font-weight: 700; color: var(--text-h); }
+.ms-trophy-date { font-size: 0.8rem; color: var(--muted); }
+
+.emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
+.milestone-dialog button.emoji-pick { padding: 0; height: 34px; font-size: 1.15rem; border-radius: 8px; background: none; border: 1px solid transparent; box-shadow: none; }
+.milestone-dialog button.emoji-pick.on { border-color: var(--ev); background: color-mix(in srgb, var(--ev) 15%, transparent); }
+
+@media (max-width: 760px) {
+  .milestones { padding: 0.75rem 0.75rem 1.5rem; }
+  .ms-grid { grid-template-columns: 1fr; }
+}
