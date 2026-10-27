@@ -11,6 +11,7 @@ import CalendarPage from './features/calendar/CalendarPage'
 import TasksPage from './features/tasks/TasksPage'
 import MilestonesPage from './features/milestones/MilestonesPage'
 import TimelinePage from './features/timeline/TimelinePage'
+import BudgetPage from './features/budget/BudgetPage'
 
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
       {route === 'notes' && <NotesPage />}
       {route === 'milestones' && <MilestonesPage />}
       {route === 'timeline' && <TimelinePage />}
+      {route === 'budget' && <BudgetPage />}
     </>
   )
 

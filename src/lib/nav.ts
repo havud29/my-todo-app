@@ -7,6 +7,7 @@ export const pages = [
   { route: 'notes', label: 'Notes', icon: '✎', hint: 'Ideas and journal' },
   { route: 'milestones', label: 'Milestones', icon: '⚑', hint: 'Long-term goals and their steps' },
   { route: 'timeline', label: 'Timeline', icon: '⇣', hint: 'Everything coming up, in order' },
+  { route: 'budget', label: 'Budget', icon: '$', hint: 'Track spending and income' },
 ] as const
 
 export type Route = (typeof pages)[number]['route']
