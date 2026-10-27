@@ -5,6 +5,8 @@ export const pages = [
   { route: 'calendar', label: 'Calendar', icon: '◷', hint: 'Plan your days and weeks' },
   { route: 'tasks', label: 'Tasks', icon: '✓', hint: 'Your to-do lists' },
   { route: 'notes', label: 'Notes', icon: '✎', hint: 'Ideas and journal' },
+  { route: 'milestones', label: 'Milestones', icon: '⚑', hint: 'Long-term goals and their steps' },
+  { route: 'timeline', label: 'Timeline', icon: '⇣', hint: 'Everything coming up, in order' },
 ] as const
 
 export type Route = (typeof pages)[number]['route']

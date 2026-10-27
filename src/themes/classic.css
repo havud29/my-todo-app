@@ -705,3 +705,19 @@
   :root[data-theme='aero-classic'] .notes-window { height: auto; min-height: 70dvh; }
   :root[data-theme='aero-classic'] .note-list-pane { width: auto; border-right: 0; }
 }
+
+/* ---------- Milestones and Timeline windows ---------- */
+:root[data-theme='aero-classic'] :is(.milestones-window, .timeline-window) { height: 100%; min-height: 520px; max-width: 1100px; margin: 0 auto; }
+:root[data-theme='aero-classic'] :is(.milestones, .timeline) { background: linear-gradient(#fff, #f3f7fc); font-family: 'Segoe UI', Tahoma, sans-serif; }
+:root[data-theme='aero-classic'] :is(.ms-head, .tl-head) .cal-title { color: #1e395b; font: 400 1.4rem 'Segoe UI', sans-serif; text-shadow: none; }
+:root[data-theme='aero-classic'] :is(.ms-card, .ms-trophy, .tl-panel, .ms-empty) { border-radius: 4px; background: #fff; box-shadow: 0 1px 3px #0002; }
+:root[data-theme='aero-classic'] .ms-card { border-color: #c5d5e8; border-top-color: var(--ev); }
+:root[data-theme='aero-classic'] .tl-panel { border-color: #c5d5e8; }
+:root[data-theme='aero-classic'] .tl-month-head { color: #1e395b; }
+:root[data-theme='aero-classic'] .timeline button.tl-filter { border-radius: 3px; }
+:root[data-theme='aero-classic'] .timeline button.tl-check { min-height: 0; border-radius: 50%; border: 2px solid var(--ev); background: #fff; }
+:root[data-theme='aero-classic'] .milestone-dialog button.emoji-pick { min-height: 0; background: none; border: 1px solid transparent; }
+:root[data-theme='aero-classic'] .milestone-dialog button.emoji-pick.on { border-color: #3c7fb1; background: linear-gradient(#e5f4fc, #c4e5f6); }
+@media (max-width: 760px) {
+  :root[data-theme='aero-classic'] :is(.milestones-window, .timeline-window) { height: auto; min-height: 70dvh; }
+}
