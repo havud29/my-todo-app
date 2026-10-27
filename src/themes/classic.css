@@ -621,3 +621,66 @@
 
 :root[data-theme='aero-classic'] .page-window { max-width: 640px; margin: 40px auto 0; }
 :root[data-theme='aero-classic'] .page-window .placeholder { padding: 2rem; color: #333; }
+
+/* ---------- Tasks: an Explorer-style window with a navigation pane ---------- */
+:root[data-theme='aero-classic'] .tasks-window { height: 100%; min-height: 520px; max-width: 980px; margin: 0 auto; }
+:root[data-theme='aero-classic'] .tasks { padding: 0; gap: 0; }
+:root[data-theme='aero-classic'] .task-views {
+  width: 190px;
+  align-self: stretch;
+  border: 0;
+  border-right: 1px solid #d6e5f5;
+  border-radius: 0;
+  box-shadow: none;
+  background: linear-gradient(90deg, #f1f6fc, #e8f0fa);
+  padding: 6px 4px;
+}
+:root[data-theme='aero-classic'] .tasks button.task-view,
+:root[data-theme='aero-classic'] .tasks button.task-view:hover,
+:root[data-theme='aero-classic'] .tasks button.task-view:active {
+  font: 12px/1.4 'Segoe UI', Tahoma, sans-serif;
+  color: #1e395b;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: none;
+  box-shadow: none;
+}
+:root[data-theme='aero-classic'] .tasks button.task-view:hover { border-color: #b8d6fb; background: linear-gradient(#fafbfd, #ebf3fd); }
+:root[data-theme='aero-classic'] .tasks button.task-view[aria-current='true'] { border-color: #84acdd; background: linear-gradient(#dcebfc, #c1dbfc); }
+:root[data-theme='aero-classic'] .task-views-head { color: #1e395b; font: 600 12px 'Segoe UI', sans-serif; text-transform: none; letter-spacing: 0; }
+:root[data-theme='aero-classic'] .task-panel { border: 0; border-radius: 0; box-shadow: none; background: #fff; font-family: 'Segoe UI', Tahoma, sans-serif; }
+:root[data-theme='aero-classic'] .task-head .cal-title { color: #1e395b; font: 400 1.4rem 'Segoe UI', sans-serif; text-shadow: none; }
+:root[data-theme='aero-classic'] .quick-add input { border-radius: 2px; border: 1px solid #abadb3; border-top-color: #e3e9ef; background: #fff; font-size: 13px; }
+:root[data-theme='aero-classic'] .task { border-bottom-color: #eef2f7; }
+:root[data-theme='aero-classic'] .tasks button.task-main,
+:root[data-theme='aero-classic'] .tasks button.task-main:hover,
+:root[data-theme='aero-classic'] .tasks button.task-main:active {
+  border: 1px solid transparent;
+  background: none;
+  box-shadow: none;
+  border-radius: 3px;
+  color: #1e1e1e;
+  font: 13px/1.4 'Segoe UI', Tahoma, sans-serif;
+}
+:root[data-theme='aero-classic'] .tasks button.task-main:hover { border-color: #b8d6fb; background: linear-gradient(#fafbfd, #ebf3fd); }
+:root[data-theme='aero-classic'] .tasks button.task-check,
+:root[data-theme='aero-classic'] .tasks button.task-check:hover,
+:root[data-theme='aero-classic'] .tasks button.task-check:active {
+  width: 15px;
+  height: 15px;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  margin-top: 6px;
+  border-radius: 2px;
+  border: 1px solid #8e8f8f;
+  background: linear-gradient(135deg, #dcdcdc, #fff);
+  box-shadow: inset 0 0 0 1px #f4f4f4;
+}
+:root[data-theme='aero-classic'] .tasks button.task-check:hover { border-color: #3c7fb1; background: linear-gradient(135deg, #b9e3f9, #eaf6fd); }
+:root[data-theme='aero-classic'] .tasks button.task-check[aria-checked='true']::after { content: '✔'; color: #1e395b; font-size: 11px; }
+@media (max-width: 760px) {
+  :root[data-theme='aero-classic'] .tasks-window { height: auto; min-height: 0; }
+  :root[data-theme='aero-classic'] .task-views { width: auto; border-right: 0; border-bottom: 1px solid #d6e5f5; background: #f1f6fc; }
+}

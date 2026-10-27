@@ -114,7 +114,7 @@
 }
 
 /* Glass panels with a bright top edge and a sheen */
-:root[data-theme='aero-glossy'] :is(.sidebar, .month, .agenda, .week, .signin-card, .event-dialog) {
+:root[data-theme='aero-glossy'] :is(.sidebar, .month, .agenda, .week, .signin-card, .event-dialog, .task-views, .task-panel) {
   background:
     linear-gradient(180deg, rgb(255 255 255 / 0.75) 0%, rgb(255 255 255 / 0.35) 45%, rgb(255 255 255 / 0.55) 100%);
   backdrop-filter: blur(14px) saturate(1.4);
@@ -281,7 +281,7 @@
 }
 :root[data-theme='aero-modern'] .backdrop i { opacity: 0.7; }
 
-:root[data-theme='aero-modern'] :is(.sidebar, .month, .agenda, .week, .signin-card, .event-dialog) {
+:root[data-theme='aero-modern'] :is(.sidebar, .month, .agenda, .week, .signin-card, .event-dialog, .task-views, .task-panel) {
   background: linear-gradient(160deg, rgb(255 255 255 / 0.72), rgb(255 255 255 / 0.4));
   backdrop-filter: blur(24px) saturate(1.6);
   border: 1px solid rgb(255 255 255 / 0.8);
