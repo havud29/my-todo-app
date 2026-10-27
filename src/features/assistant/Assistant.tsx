@@ -6,7 +6,8 @@ import './assistant.css'
 
 const storageKey = 'assistant-chat'
 const suggestions = ["What's on my plate today?", 'Add a task to call mom tomorrow at 6pm', 'Plan my week']
-const kindIcon: Record<AssistantAction['kind'], string> = { task: '✓', event: '◷', note: '✎' }
+const kindIcon: Record<AssistantAction['kind'], string> = { task: '✓', event: '◷', note: '✎', transaction: '¤', budget: '¤', milestone: '⚑' }
+const kindLabel: Record<AssistantAction['kind'], string> = { task: 'task', event: 'event', note: 'note', transaction: '', budget: '', milestone: 'milestone' }
 
 // Floating "Ask Claude" button and chat window. Claude's changes reach the
 // pages through their live sync, so nothing here needs to refresh them.
@@ -90,7 +91,7 @@ export default function Assistant() {
           <div className="assistant-log" ref={list} aria-live="polite">
             {messages.length === 0 && (
               <div className="assistant-empty">
-                <p>Ask me about your day, or tell me what to add or change in your tasks, calendar and notes.</p>
+                <p>Ask me about your day, or tell me what to add or change in your tasks, calendar, notes, milestones and budget.</p>
                 <div className="assistant-suggestions">
                   {suggestions.map((s) => (
                     <button key={s} className="assistant-suggestion" onClick={() => send(s)}>
@@ -107,7 +108,7 @@ export default function Assistant() {
                   <ul className="assistant-actions">
                     {m.actions.map((a, j) => (
                       <li key={j} className={a.verb}>
-                        <span aria-hidden>{kindIcon[a.kind]}</span> {capitalize(a.verb)} {a.kind} “{a.title}”
+                        <span aria-hidden>{kindIcon[a.kind]}</span> {capitalize(a.verb)} {kindLabel[a.kind] ? `${kindLabel[a.kind]} “${a.title}”` : a.title}
                       </li>
                     ))}
                   </ul>

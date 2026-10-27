@@ -21,7 +21,7 @@ npm run dev                  # http://localhost:5173/my-todo-app/
 
 ## Claude assistant
 
-The "Ask Claude" button opens a chat where Claude can read and change your tasks, events and notes. It calls the Anthropic API from the Supabase Edge Function in `supabase/functions/assistant/`, so the API key never reaches the browser. Claude acts with your own sign-in, so row-level security keeps it to your data. It uses Claude Opus 5.5 at low effort; a typical message costs a few US cents, more when Claude makes several changes at once.
+The "Ask Claude" button opens a chat where Claude can read and change your tasks, events, notes, milestones and budget. It calls the Anthropic API from the Supabase Edge Function in `supabase/functions/assistant/`, so the API key never reaches the browser. Claude acts with your own sign-in, so row-level security keeps it to your data. It uses Claude Opus 5.5 at low effort; a typical message costs a few US cents, more when Claude makes several changes at once.
 
 A claude.ai subscription can't be used here: the API is billed separately, pay as you go.
 

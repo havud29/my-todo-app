@@ -1,6 +1,6 @@
 // Something Claude changed in the app while answering
 export interface AssistantAction {
-  kind: 'task' | 'event' | 'note'
+  kind: 'task' | 'event' | 'note' | 'transaction' | 'budget' | 'milestone'
   verb: 'added' | 'updated' | 'deleted'
   title: string
 }
