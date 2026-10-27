@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="wallet" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fd65a"/><stop offset=".5" stop-color="#3c9e1e"/><stop offset=".51" stop-color="#2f8a14"/><stop offset="1" stop-color="#1f6a09"/></linearGradient>
+    <linearGradient id="flap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a6eb83"/><stop offset="1" stop-color="#4cae27"/></linearGradient>
+    <linearGradient id="note" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4fff0"/><stop offset="1" stop-color="#c9e8bd"/></linearGradient>
+    <radialGradient id="coin" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff6c2"/><stop offset=".45" stop-color="#ffcf2e"/><stop offset="1" stop-color="#c78400"/></radialGradient>
+  </defs>
+  <rect x="5" y="14" width="36" height="28" rx="4" fill="#000" opacity=".18" transform="translate(1 2)"/>
+  <rect x="10" y="7" width="26" height="15" rx="1.5" fill="url(#note)" stroke="#6c9a5c" transform="rotate(-8 23 14)"/>
+  <circle cx="23" cy="13" r="3.5" fill="none" stroke="#7fb06e" transform="rotate(-8 23 14)"/>
+  <rect x="5" y="14" width="36" height="28" rx="4" fill="url(#wallet)" stroke="#185205"/>
+  <path d="M7 16h32a2 2 0 0 1 2 2v3H5v-3a2 2 0 0 1 2-2z" fill="#fff" opacity=".28"/>
+  <path d="M28 24h13v10H28a5 5 0 0 1 0-10z" fill="url(#flap)" stroke="#185205"/>
+  <circle cx="29.5" cy="29" r="2" fill="#fff" stroke="#185205"/>
+  <circle cx="36" cy="37" r="7" fill="url(#coin)" stroke="#8a5a00"/>
+  <circle cx="36" cy="37" r="4.6" fill="none" stroke="#b07a00" opacity=".7"/>
+  <path d="M33.5 33.5a5 4 0 0 1 5-1" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="1.2" stroke-linecap="round"/>
+</svg>

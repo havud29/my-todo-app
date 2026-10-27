@@ -5,6 +5,7 @@ export const pages = [
   { route: 'calendar', label: 'Calendar', icon: '◷', hint: 'Plan your days and weeks' },
   { route: 'tasks', label: 'Tasks', icon: '✓', hint: 'Your to-do lists' },
   { route: 'notes', label: 'Notes', icon: '✎', hint: 'Ideas and journal' },
+  { route: 'budget', label: 'Budget', icon: '$', hint: 'Track spending and income' },
 ] as const
 
 export type Route = (typeof pages)[number]['route']
