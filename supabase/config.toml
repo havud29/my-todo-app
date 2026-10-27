@@ -1,0 +1,4 @@
+# Claude calls the MCP connector without a Supabase session; the function
+# checks its own private link token instead.
+[functions.mcp]
+verify_jwt = false

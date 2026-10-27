@@ -1,0 +1,124 @@
+/* "Use with Claude": a floating launcher and a setup window over the page.
+   Colors come from the theme tokens; Classic adds its window frame below. */
+.assistant-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1rem 0.55rem 0.6rem;
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+}
+.assistant-fab img { width: 26px; height: 26px; }
+
+.assistant-panel {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 40;
+  width: min(400px, calc(100vw - 32px));
+  height: min(600px, calc(100dvh - 40px));
+  display: flex;
+  animation: assistant-pop 0.18s ease-out;
+}
+@keyframes assistant-pop { from { opacity: 0; transform: translateY(12px) scale(0.98); } }
+@media (prefers-reduced-motion: reduce) { .assistant-panel { animation: none; } }
+
+.assistant-inner {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.assistant-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.6rem 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-h);
+}
+.assistant-head strong { flex: 1; }
+.assistant-head .link-btn { font-size: 0.8rem; }
+.assistant-close { width: 30px; height: 30px; }
+
+.assistant-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1rem 1.1rem 1.2rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.assistant-lead { margin: 0 0 1rem; color: var(--text); }
+.assistant-body a { color: var(--accent); font-weight: 600; }
+.assistant-steps { margin: 0; padding-left: 1.3rem; display: flex; flex-direction: column; gap: 0.9rem; }
+.assistant-steps > li { padding-left: 0.2rem; }
+.assistant-steps > li > :is(strong, span, small, button, .assistant-link) { display: block; }
+.assistant-steps > li > strong { color: var(--text-h); margin-bottom: 0.3rem; }
+.assistant-steps small, .assistant-links small { display: block; color: var(--muted); font-size: 0.78rem; margin-top: 0.35rem; }
+.assistant-steps ul { margin: 0.3rem 0 0; padding-left: 1rem; color: var(--muted); }
+.assistant-link { display: flex; gap: 0.4rem; }
+.assistant-link input {
+  flex: 1;
+  min-width: 0;
+  font: 0.78rem ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+}
+.assistant-error { color: var(--danger); margin: 1rem 0 0; }
+.assistant-links { margin-top: 1.25rem; padding-top: 0.9rem; border-top: 1px solid var(--border); }
+.assistant-links h3 { margin: 0 0 0.5rem; font-size: 0.85rem; color: var(--text-h); }
+.assistant-link-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.35rem 0; }
+.assistant-link-row small { margin-top: 0; }
+.assistant-link-row button { padding: 0.3rem 0.7rem; font-size: 0.8rem; }
+.assistant-link-row .danger { color: var(--danger); }
+
+@media (max-width: 760px) {
+  .assistant-fab { right: 12px; bottom: calc(72px + env(safe-area-inset-bottom)); padding: 0.6rem; }
+  .assistant-fab span { display: none; }
+  .assistant-panel {
+    right: 8px;
+    left: 8px;
+    width: auto;
+    top: 8px;
+    bottom: calc(68px + env(safe-area-inset-bottom));
+    height: auto;
+  }
+}
+
+/* Glossy and Modern: frosted glass like their other panels */
+:root[data-theme='aero-glossy'] .assistant-inner,
+:root[data-theme='aero-modern'] .assistant-inner {
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(20px) saturate(1.5);
+}
+:root[data-theme='aero-glossy'] .assistant-fab,
+:root[data-theme='aero-modern'] .assistant-fab { backdrop-filter: blur(12px); }
+
+/* Classic: a real Windows 7 window above the taskbar */
+:root[data-theme='aero-classic'] .assistant-fab { bottom: 52px; border-radius: 4px; }
+:root[data-theme='aero-classic'] .assistant-panel { bottom: 50px; height: min(560px, calc(100dvh - 64px)); }
+:root[data-theme='aero-classic'] .assistant-panel .win { flex: 1; min-width: 0; box-shadow: 0 8px 30px rgb(0 0 0 / 0.5); }
+:root[data-theme='aero-classic'] .assistant-panel .win-body { display: flex; }
+:root[data-theme='aero-classic'] .assistant-inner { border: 0; border-radius: 0; box-shadow: none; background: #fff; font: 12px 'Segoe UI', Tahoma, sans-serif; }
+:root[data-theme='aero-classic'] .assistant-head { display: none; }
+:root[data-theme='aero-classic'] .assistant-body { font-size: 12px; color: #000; }
+:root[data-theme='aero-classic'] .assistant-body a { color: #0066cc; font-weight: 400; }
+:root[data-theme='aero-classic'] .assistant-steps > li > strong { color: #1e3287; font-weight: 400; font-size: 13px; }
+:root[data-theme='aero-classic'] .assistant-link input { border-radius: 2px; border-color: #abadb3; background: #fff; color: #000; font-size: 11px; }
+@media (max-width: 760px) {
+  :root[data-theme='aero-classic'] .assistant-fab { bottom: calc(52px + env(safe-area-inset-bottom)); }
+  :root[data-theme='aero-classic'] .assistant-panel { top: 6px; bottom: calc(50px + env(safe-area-inset-bottom)); height: auto; }
+}
