@@ -3,15 +3,10 @@ import { format } from 'date-fns'
 import type { Session } from '@supabase/supabase-js'
 import { signOut } from './lib/supabase'
 import { setTheme, themes, useTheme } from './lib/theme'
-import type { Route } from './lib/useHashRoute'
+import { pages as programs, type Route } from './lib/nav'
 
 const icon = (name: string) => `${import.meta.env.BASE_URL}aero/${name}.svg`
 
-const programs: { route: Route; label: string; hint: string }[] = [
-  { route: 'calendar', label: 'Calendar', hint: 'Plan your days and weeks' },
-  { route: 'tasks', label: 'Tasks', hint: 'Your to-do lists' },
-  { route: 'notes', label: 'Notes', hint: 'Ideas and journal' },
-]
 
 // Windows 7 style desktop: wallpaper, the page in front, and a taskbar with a
 // Start orb, pinned programs and a clock.

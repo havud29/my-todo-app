@@ -1,6 +1,7 @@
 import { signOut } from './lib/supabase'
 import { useSession } from './lib/useSession'
-import { useHashRoute, type Route } from './lib/useHashRoute'
+import { useHashRoute } from './lib/useHashRoute'
+import { pages } from './lib/nav'
 import SignIn from './SignIn'
 import ThemeSwitch from './ThemeSwitch'
 import ClassicShell from './ClassicShell'
@@ -9,11 +10,6 @@ import NotesPage from './features/notes/NotesPage'
 import CalendarPage from './features/calendar/CalendarPage'
 import TasksPage from './features/tasks/TasksPage'
 
-const tabs: { route: Route; label: string; icon: string }[] = [
-  { route: 'calendar', label: 'Calendar', icon: '◷' },
-  { route: 'tasks', label: 'Tasks', icon: '✓' },
-  { route: 'notes', label: 'Notes', icon: '✎' },
-]
 
 export default function App() {
   const session = useSession()
@@ -39,7 +35,7 @@ export default function App() {
     )
   }
 
-  const links = tabs.map((t) => (
+  const links = pages.map((t) => (
     <a key={t.route} href={`#/${t.route}`} aria-current={route === t.route ? 'page' : undefined}>
       <span className="nav-icon" aria-hidden>
         {t.icon}
