@@ -86,7 +86,8 @@
 .assistant-link-row .danger { color: var(--danger); }
 
 @media (max-width: 760px) {
-  .assistant-fab { right: 12px; bottom: calc(72px + env(safe-area-inset-bottom)); padding: 0.6rem; }
+  /* Bottom left on phones, so it never covers the page's own + button */
+  .assistant-fab { right: auto; left: 12px; bottom: calc(72px + env(safe-area-inset-bottom)); padding: 0.6rem; }
   .assistant-fab span { display: none; }
   .assistant-panel {
     right: 8px;
