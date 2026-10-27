@@ -12,7 +12,7 @@ npm run dev                  # http://localhost:5173/my-todo-app/
 
 ## One-time setup (Phase 1)
 
-1. **Supabase:** create a project, then run each file in `supabase/migrations/` in order (`001_init.sql`, then `002_milestones.sql`, …) in the SQL Editor.
+1. **Supabase:** create a project. The database tables come from `supabase/migrations/`; let GitHub apply them (see *Automatic database migrations* below), or run each file in order in the SQL Editor. Every migration is safe to run again.
 2. **GitHub OAuth app:** Settings → Developer settings → OAuth Apps → New. Homepage `https://havud29.github.io/my-todo-app/`, callback `https://<project-ref>.supabase.co/auth/v1/callback`. Paste the Client ID and Secret into Supabase → Authentication → Sign In / Providers → GitHub.
 3. **Google OAuth client:** in Google Cloud Console, set the consent screen to External / Testing with yourself as test user. Create a Web OAuth client with JavaScript origins `https://havud29.github.io` and `http://localhost:5173`, and the Supabase callback above as redirect URI. Paste the ID and Secret into Supabase → Providers → Google.
 4. **Supabase URL settings** (Authentication → URL Configuration): Site URL `https://havud29.github.io/my-todo-app/`, plus redirect URL `http://localhost:5173/**`.
@@ -25,7 +25,7 @@ Claude can read and change your tasks, events, notes, milestones and budget from
 
 One-time setup:
 
-1. **Database:** run `supabase/migrations/004_connector_tokens.sql` in the SQL Editor.
+1. **Database:** `supabase/migrations/004_connector_tokens.sql` must be applied (automatic once migrations are set up below).
 2. **Deploy the function** with JWT verification off (Claude doesn't send a Supabase session; the private link is checked instead). Either way:
    - *Automatically:* create a token at [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens). In this repo, add it under Settings → Secrets and variables → Actions → Secrets as `SUPABASE_ACCESS_TOKEN`, and add a Variable `SUPABASE_PROJECT_REF` with your project ref (the `<project-ref>` in your Supabase URL). Then run the "Deploy Supabase functions" workflow once from the Actions tab; it redeploys whenever the function changes.
    - *By hand:* Edge Functions → Deploy a new function → Via editor, name it `mcp`, paste `supabase/functions/mcp/index.ts`, turn off "Verify JWT", and deploy.
@@ -37,4 +37,14 @@ Never commit the `service_role` key or the database password.
 
 ## Budget
 
-Run `supabase/migrations/003_budget.sql` in the Supabase SQL Editor once. It adds `transactions` (money in and out) and `budgets` (a monthly limit per spending category), both private to their owner and synced live. Amounts accept shorthand like `45k` or `1.5m`, and the currency is picked on the Budget page (remembered per device).
+`supabase/migrations/003_budget.sql` adds `transactions` (money in and out) and `budgets` (a monthly limit per spending category), both private to their owner and synced live. Amounts accept shorthand like `45k` or `1.5m`, and the currency is picked on the Budget page (remembered per device).
+
+## Automatic database migrations
+
+The "Apply database migrations" workflow runs `supabase db push` whenever a change to `supabase/migrations/` reaches `main`, and can be run by hand from the Actions tab. It needs, under Settings → Secrets and variables → Actions:
+
+- Secret `SUPABASE_ACCESS_TOKEN`: a token from [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens) (shared with the functions workflow).
+- Secret `SUPABASE_DB_PASSWORD`: the database password from Supabase → Project Settings → Database (reset it there if you don't have it).
+- Variable `SUPABASE_PROJECT_REF`: the `<project-ref>` in your Supabase URL.
+
+Every migration is written to be safe to run again (`if not exists`, policies and triggers dropped and recreated), so the first run also works on a database where some were already run by hand. New migrations go in a new file with the next number, e.g. `005_something.sql`, and should follow the same pattern; `public.setup_owned_table('name')` adds the owner-only policy, `updated_at` trigger and live sync for a new table.

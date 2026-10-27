@@ -1,3 +1,7 @@
+-- Every migration here is safe to run again: GitHub Actions applies them with
+-- `supabase db push`, including on databases where they were first run by
+-- hand in the SQL Editor.
+
 -- shared helper: bump updated_at on every change
 create or replace function public.set_updated_at()
 returns trigger language plpgsql as $$
@@ -6,7 +10,7 @@ begin
   return new;
 end $$;
 
-create table public.notes (
+create table if not exists public.notes (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null default auth.uid() references auth.users on delete cascade,
   title       text not null default '',
@@ -19,10 +23,10 @@ create table public.notes (
   fts tsvector generated always as
     (to_tsvector('simple', coalesce(title,'') || ' ' || coalesce(body,''))) stored
 );
-create index notes_fts_idx on public.notes using gin (fts);
-create index notes_user_updated_idx on public.notes (user_id, updated_at);
+create index if not exists notes_fts_idx on public.notes using gin (fts);
+create index if not exists notes_user_updated_idx on public.notes (user_id, updated_at);
 
-create table public.events (
+create table if not exists public.events (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null default auth.uid() references auth.users on delete cascade,
   title       text not null,
@@ -39,9 +43,9 @@ create table public.events (
   deleted_at  timestamptz,
   check (ends_at is null or ends_at >= starts_at)
 );
-create index events_user_start_idx on public.events (user_id, starts_at);
+create index if not exists events_user_start_idx on public.events (user_id, starts_at);
 
-create table public.tasks (
+create table if not exists public.tasks (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null default auth.uid() references auth.users on delete cascade,
   title       text not null,
@@ -57,21 +61,27 @@ create table public.tasks (
   updated_at  timestamptz not null default now(),
   deleted_at  timestamptz
 );
-create index tasks_user_due_idx on public.tasks (user_id, done, due_at);
+create index if not exists tasks_user_due_idx on public.tasks (user_id, done, due_at);
 
--- triggers + row-level security on all three tables
-do $$
-declare t text;
+-- Owner-only access, the updated_at trigger and live sync for a table.
+-- Later migrations reuse this for their own tables.
+create or replace function public.setup_owned_table(t text)
+returns void language plpgsql as $$
 begin
-  foreach t in array array['notes','events','tasks'] loop
-    execute format('create trigger %I_updated before update on public.%I
-                    for each row execute function public.set_updated_at()', t, t);
-    execute format('alter table public.%I enable row level security', t);
-    execute format('create policy "owner only" on public.%I for all to authenticated
-                    using ((select auth.uid()) = user_id)
-                    with check ((select auth.uid()) = user_id)', t);
-  end loop;
+  execute format('drop trigger if exists %I_updated on public.%I', t, t);
+  execute format('create trigger %I_updated before update on public.%I
+                  for each row execute function public.set_updated_at()', t, t);
+  execute format('alter table public.%I enable row level security', t);
+  execute format('drop policy if exists "owner only" on public.%I', t);
+  execute format('create policy "owner only" on public.%I for all to authenticated
+                  using ((select auth.uid()) = user_id)
+                  with check ((select auth.uid()) = user_id)', t);
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = t
+  ) then
+    execute format('alter publication supabase_realtime add table public.%I', t);
+  end if;
 end $$;
 
--- live sync between devices
-alter publication supabase_realtime add table public.notes, public.events, public.tasks;
+select public.setup_owned_table(t) from unnest(array['notes', 'events', 'tasks']) as t;

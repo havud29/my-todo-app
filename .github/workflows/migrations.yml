@@ -1,0 +1,26 @@
+name: Apply database migrations
+on:
+  push:
+    branches: [main]
+    paths: ['supabase/migrations/**']
+  workflow_dispatch:
+permissions: { contents: read }
+concurrency: { group: migrations, cancel-in-progress: false }
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    # Skips quietly until the Supabase settings are added (see README)
+    if: ${{ vars.SUPABASE_PROJECT_REF != '' }}
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with: { version: latest }
+      - run: supabase link --project-ref ${{ vars.SUPABASE_PROJECT_REF }}
+      # Lists what will run, then applies every migration the database hasn't
+      # recorded yet. They are all safe to re-run, so ones first run by hand
+      # in the SQL Editor are fine.
+      - run: supabase migration list
+      - run: supabase db push
