@@ -628,22 +628,32 @@ async function answer(msg: RpcRequest, ctx: Ctx, tz: string) {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
   // Stateless Streamable HTTP: no server-sent stream and no sessions to end
-  if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: { ...cors, Allow: 'POST' } })
+  if (req.method !== 'POST') {
+    // Also what a browser shows, which makes a handy "is it deployed?" check
+    const text = 'The My To-do connector is running. Add this link in Claude under Settings > Connectors.'
+    return new Response(text, { status: 405, headers: { ...cors, Allow: 'POST', 'Content-Type': 'text/plain' } })
+  }
 
   // URL is .../functions/v1/mcp/<token>
   const token = new URL(req.url).pathname.split('/').filter(Boolean).pop() ?? ''
-  if (token.length < 32) return json(rpcError(null, -32001, 'This connector link is incomplete. Copy it again from the app.'), 401)
+  // Bad links get 404, not 401: a 401 makes Claude start an OAuth sign-in,
+  // which this connector doesn't use, and hides the real problem
+  if (token.length < 32) return json(rpcError(null, -32001, 'This connector link is incomplete. Copy it again from the app.'), 404)
 
   const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, {
     auth: { persistSession: false },
   })
-  const { data: link } = await admin
+  const { data: link, error } = await admin
     .from('connector_tokens')
     .select('id,user_id,timezone,last_used_at')
     .eq('token_hash', await sha256(token))
     .is('revoked_at', null)
     .maybeSingle()
-  if (!link) return json(rpcError(null, -32001, 'This connector link was removed. Make a new one in the app.'), 401)
+  if (error) {
+    console.error('connector_tokens lookup failed', error)
+    return json(rpcError(null, -32603, `Could not check the connector link: ${error.message}`), 500)
+  }
+  if (!link) return json(rpcError(null, -32001, 'This connector link was removed. Make a new one in the app.'), 404)
 
   // Note when the link was last used, at most hourly
   if (!link.last_used_at || Date.now() - Date.parse(link.last_used_at) > 3_600_000) {
