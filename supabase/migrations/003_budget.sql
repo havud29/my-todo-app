@@ -1,6 +1,6 @@
 -- Budget: money in and out, plus a monthly spending limit per category
 
-create table public.transactions (
+create table if not exists public.transactions (
   id           uuid primary key default gen_random_uuid(),
   user_id      uuid not null default auth.uid() references auth.users on delete cascade,
   kind         text not null default 'expense' check (kind in ('expense', 'income')),
@@ -12,9 +12,9 @@ create table public.transactions (
   updated_at   timestamptz not null default now(),
   deleted_at   timestamptz
 );
-create index transactions_user_date_idx on public.transactions (user_id, occurred_on);
+create index if not exists transactions_user_date_idx on public.transactions (user_id, occurred_on);
 
-create table public.budgets (
+create table if not exists public.budgets (
   id             uuid primary key default gen_random_uuid(),
   user_id        uuid not null default auth.uid() references auth.users on delete cascade,
   category       text not null,
@@ -24,19 +24,6 @@ create table public.budgets (
   deleted_at     timestamptz
 );
 -- one live limit per category
-create unique index budgets_user_category_idx on public.budgets (user_id, lower(category)) where deleted_at is null;
+create unique index if not exists budgets_user_category_idx on public.budgets (user_id, lower(category)) where deleted_at is null;
 
-do $$
-declare t text;
-begin
-  foreach t in array array['transactions','budgets'] loop
-    execute format('create trigger %I_updated before update on public.%I
-                    for each row execute function public.set_updated_at()', t, t);
-    execute format('alter table public.%I enable row level security', t);
-    execute format('create policy "owner only" on public.%I for all to authenticated
-                    using ((select auth.uid()) = user_id)
-                    with check ((select auth.uid()) = user_id)', t);
-  end loop;
-end $$;
-
-alter publication supabase_realtime add table public.transactions, public.budgets;
+select public.setup_owned_table(t) from unnest(array['transactions', 'budgets']) as t;
