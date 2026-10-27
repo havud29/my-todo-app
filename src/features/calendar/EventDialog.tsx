@@ -118,6 +118,12 @@ export default function EventDialog({ target, onSave, onDelete, onClose }: Props
       onClick={(e) => e.target === dialog.current && dialog.current.close()}
     >
       <form onSubmit={submit}>
+        <header className="win-title">
+          <span className="win-title-text">{editing ? 'Edit event' : 'New event'}</span>
+          <span className="win-controls">
+            <button type="button" className="win-btn close" onClick={() => dialog.current?.close()} aria-label="Close" />
+          </span>
+        </header>
         <div className="dialog-accent" />
         <input
           className="title-input"

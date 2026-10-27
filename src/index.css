@@ -171,7 +171,7 @@ button.primary:hover { filter: brightness(1.06); }
 .sidebar .account { margin-top: auto; padding: 0.75rem 0.5rem 0; border-top: 1px solid var(--border); }
 .account .email { font-size: 0.8rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 0.5rem; }
 .account button { width: 100%; }
-.content { flex: 1; min-width: 0; overflow: auto; }
+.content { flex: 1; min-width: 0; overflow: auto; display: flex; flex-direction: column; }
 .placeholder { color: var(--muted); padding: 2rem; }
 .tabbar { display: none; }
 
@@ -193,3 +193,8 @@ button.primary:hover { filter: brightness(1.06); }
   .tabbar a { flex: 1; flex-direction: column; justify-content: center; gap: 2px; font-size: 0.72rem; padding: 0; }
   .tabbar a[aria-current='page'] { color: var(--accent); }
 }
+
+/* Window frames are drawn only by the Classic theme */
+.win, .win-body { display: contents; }
+.win-title { display: none; }
+.cal-desktop { display: contents; }
