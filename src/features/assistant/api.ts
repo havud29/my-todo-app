@@ -1,37 +1,38 @@
-import { FunctionsHttpError } from '@supabase/supabase-js'
 import { supabase } from '../../lib/supabase'
-import type { AssistantReply, ChatMessage } from './types'
+import type { ConnectorLink } from './types'
 
-// Sends the chat to the "assistant" Edge Function, which holds the Anthropic
-// key and runs Claude's tool calls with the signed-in user's permissions.
-export async function askAssistant(messages: ChatMessage[]): Promise<AssistantReply> {
-  const { data, error } = await supabase.functions.invoke<AssistantReply>('assistant', {
-    body: {
-      messages: messages.map(({ role, content }) => ({ role, content })),
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      now: localNow(),
-    },
-  })
-  if (error) throw new Error(await describe(error))
-  return data ?? { reply: '', actions: [] }
+const columns = 'id,label,created_at,last_used_at'
+
+export async function listLinks(): Promise<ConnectorLink[]> {
+  const { data, error } = await supabase
+    .from('connector_tokens')
+    .select(columns)
+    .is('revoked_at', null)
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data
 }
 
-// e.g. "Tuesday 2026-10-27 10:49 (UTC+07:00)"
-function localNow() {
-  const d = new Date()
-  const pad = (n: number) => String(n).padStart(2, '0')
-  const off = -d.getTimezoneOffset()
-  const sign = off >= 0 ? '+' : '-'
-  const day = d.toLocaleDateString('en-US', { weekday: 'long' })
-  return `${day} ${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())} (UTC${sign}${pad(Math.floor(Math.abs(off) / 60))}:${pad(Math.abs(off) % 60)})`
+// Makes a new private link for the MCP connector. Only the token's hash is
+// saved, so the returned URL can't be shown again later.
+export async function createLink(): Promise<{ link: ConnectorLink; url: string }> {
+  const bytes = crypto.getRandomValues(new Uint8Array(32))
+  const token = btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+  const { data, error } = await supabase
+    .from('connector_tokens')
+    .insert({ token_hash: await sha256(token), timezone: Intl.DateTimeFormat().resolvedOptions().timeZone })
+    .select(columns)
+    .single()
+  if (error) throw error
+  return { link: data, url: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mcp/${token}` }
 }
 
-async function describe(error: unknown) {
-  if (error instanceof FunctionsHttpError) {
-    const body = await error.context.json().catch(() => null)
-    if (body?.error === 'missing_key') return 'Claude is not set up yet: add the ANTHROPIC_API_KEY secret in Supabase.'
-    if (body?.message) return body.message as string
-    if (error.context.status === 404) return 'The assistant function is not deployed yet.'
-  }
-  return error instanceof Error ? error.message : 'Could not reach Claude'
+export async function revokeLink(id: string): Promise<void> {
+  const { error } = await supabase.from('connector_tokens').update({ revoked_at: new Date().toISOString() }).eq('id', id)
+  if (error) throw error
+}
+
+async function sha256(text: string) {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('')
 }

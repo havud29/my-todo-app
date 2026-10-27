@@ -1,18 +1,7 @@
-// Something Claude changed in the app while answering
-export interface AssistantAction {
-  kind: 'task' | 'event' | 'note' | 'transaction' | 'budget' | 'milestone'
-  verb: 'added' | 'updated' | 'deleted'
-  title: string
-}
-
-export interface AssistantReply {
-  reply: string
-  actions: AssistantAction[]
-}
-
-export interface ChatMessage {
-  role: 'user' | 'assistant'
-  content: string
-  actions?: AssistantAction[]
-  error?: boolean
+// A row of public.connector_tokens; the token itself is never stored
+export interface ConnectorLink {
+  id: string
+  label: string
+  created_at: string
+  last_used_at: string | null
 }

@@ -8,7 +8,7 @@ import { useTheme } from './lib/theme'
 import NotesPage from './features/notes/NotesPage'
 import CalendarPage from './features/calendar/CalendarPage'
 import TasksPage from './features/tasks/TasksPage'
-import Assistant from './features/assistant/Assistant'
+import ConnectClaude from './features/assistant/ConnectClaude'
 
 const tabs: { route: Route; label: string; icon: string }[] = [
   { route: 'calendar', label: 'Calendar', icon: '◷' },
@@ -38,7 +38,7 @@ export default function App() {
         <ClassicShell session={session} route={route}>
           {page}
         </ClassicShell>
-        <Assistant />
+        <ConnectClaude />
       </>
     )
   }
@@ -73,7 +73,7 @@ export default function App() {
         {links}
         <ThemeSwitch compact />
       </nav>
-      <Assistant />
+      <ConnectClaude />
     </div>
   )
 }

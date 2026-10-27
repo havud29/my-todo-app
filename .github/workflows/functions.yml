@@ -16,4 +16,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: supabase/setup-cli@v1
         with: { version: latest }
-      - run: supabase functions deploy assistant --project-ref ${{ vars.SUPABASE_PROJECT_REF }}
+      - run: supabase functions deploy mcp --no-verify-jwt --project-ref ${{ vars.SUPABASE_PROJECT_REF }}

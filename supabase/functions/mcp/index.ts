@@ -1,23 +1,24 @@
-// Supabase Edge Function: chat with Claude, who can read and change the
-// signed-in user's tasks, events, notes, milestones and budget through tools.
+// Supabase Edge Function: a remote MCP server, so Claude (claude.ai, the
+// desktop and phone apps) can read and change the user's tasks, events,
+// notes, milestones and budget. Added in Claude as a custom connector, so it
+// runs on the user's own Claude plan with no API key.
 //
-// The Anthropic API key lives only here, as the ANTHROPIC_API_KEY secret.
-// Database calls run with the caller's own access token, so row-level
-// security limits Claude to that user's rows, exactly like the web app.
+// The connector URL ends in a private token made on the app's Claude panel.
+// Only its SHA-256 hash is stored (public.connector_tokens). Claude can't
+// send the user's Supabase session, so this function uses the service role
+// key, and every query goes through scoped(), which pins it to the token's
+// owner. Deploy with JWT verification off (see supabase/config.toml).
 //
 // Kept to one file so it can also be pasted into the Supabase dashboard editor.
 
-import Anthropic from 'npm:@anthropic-ai/sdk@1.3.0'
 import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2.118.0'
 
-const MODEL = 'claude-opus-5-5'
-const MAX_STEPS = 10 // tool rounds per message
-const MAX_HISTORY = 30 // messages kept from the chat
+const PROTOCOL_VERSIONS = ['2025-11-25', '2025-06-18', '2025-03-26', '2024-11-05']
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, content-type, mcp-protocol-version, mcp-session-id',
+  'Access-Control-Allow-Methods': 'POST, GET, DELETE, OPTIONS',
 }
 
 const json = (body: unknown, status = 200) =>
@@ -26,20 +27,36 @@ const json = (body: unknown, status = 200) =>
 // ---------------------------------------------------------------- tools
 
 type Input = Record<string, unknown>
-type Ctx = { db: SupabaseClient; done: Action[]; today: string } // today is YYYY-MM-DD in the user's zone
-// Something Claude changed, shown under its reply
-type Action = { kind: 'task' | 'event' | 'note' | 'transaction' | 'budget' | 'milestone'; verb: 'added' | 'updated' | 'deleted'; title: string }
+type Ctx = { db: Db; today: string } // today is YYYY-MM-DD in the user's zone
+type Tool = {
+  name: string
+  description: string
+  inputSchema: Record<string, unknown>
+  annotations?: { title?: string; readOnlyHint?: boolean; destructiveHint?: boolean; idempotentHint?: boolean }
+}
+
+// Every query goes through this, so each one only sees the link owner's rows
+function scoped(admin: SupabaseClient, userId: string) {
+  const own = (row: Input) => ({ ...row, user_id: userId })
+  return {
+    // Rows come back untyped; handlers hand them to Claude as JSON
+    select: (table: string, columns: string) => admin.from(table).select<string, Record<string, unknown>>(columns).eq('user_id', userId),
+    insert: (table: string, rows: Input | Input[]) => admin.from(table).insert(Array.isArray(rows) ? rows.map(own) : own(rows)),
+    update: (table: string, patch: Input) => admin.from(table).update(patch).eq('user_id', userId),
+  }
+}
+type Db = ReturnType<typeof scoped>
 
 const isoField = (what: string) => ({
   type: 'string',
   description: `${what} as ISO 8601 with the user's UTC offset, e.g. 2026-11-03T09:00:00+07:00`,
 })
 
-const tools: Anthropic.Tool[] = [
+const tools: Tool[] = [
   {
     name: 'list_tasks',
     description: 'List the user\'s tasks. Use before updating or deleting so you have the right id.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: { include_done: { type: 'boolean', description: 'Also return completed tasks. Default false.' } },
     },
@@ -47,7 +64,7 @@ const tools: Anthropic.Tool[] = [
   {
     name: 'create_task',
     description: 'Add a to-do task.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: {
         title: { type: 'string' },
@@ -62,7 +79,7 @@ const tools: Anthropic.Tool[] = [
   {
     name: 'update_task',
     description: 'Change a task, including marking it done or not done. Only the fields given are changed.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: {
         id: { type: 'string' },
@@ -79,13 +96,13 @@ const tools: Anthropic.Tool[] = [
   {
     name: 'delete_task',
     description: 'Delete a task.',
-    input_schema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
+    inputSchema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
   },
   {
     name: 'list_events',
     description:
       'List calendar events that may fall between two moments. Repeating events are returned once, with an RRULE in "recurrence" and their first start in "starts_at".',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: { from: isoField('Range start'), to: isoField('Range end') },
       required: ['from', 'to'],
@@ -95,7 +112,7 @@ const tools: Anthropic.Tool[] = [
     name: 'create_event',
     description:
       'Add a calendar event. For all-day events set all_day true and use local midnight of the first day for starts_at and of the last day (inclusive) for ends_at.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: {
         title: { type: 'string' },
@@ -117,7 +134,7 @@ const tools: Anthropic.Tool[] = [
   {
     name: 'update_event',
     description: 'Change an event. Only the fields given are changed. Pass recurrence null to stop it repeating.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: {
         id: { type: 'string' },
@@ -136,17 +153,17 @@ const tools: Anthropic.Tool[] = [
   {
     name: 'delete_event',
     description: 'Delete an event, including every repeat of it.',
-    input_schema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
+    inputSchema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
   },
   {
     name: 'search_notes',
     description: 'Find notes by words in the title or body. Without a query, returns the most recently edited notes.',
-    input_schema: { type: 'object', properties: { query: { type: 'string' } } },
+    inputSchema: { type: 'object', properties: { query: { type: 'string' } } },
   },
   {
     name: 'create_note',
     description: 'Write a new note. The body is plain text or Markdown.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: {
         title: { type: 'string' },
@@ -161,7 +178,7 @@ const tools: Anthropic.Tool[] = [
     name: 'update_note',
     description:
       'Change a note. Only the fields given are changed. To add to a note, read it with search_notes and send the whole new body.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: {
         id: { type: 'string' },
@@ -176,12 +193,12 @@ const tools: Anthropic.Tool[] = [
   {
     name: 'delete_note',
     description: 'Delete a note.',
-    input_schema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
+    inputSchema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
   },
   {
     name: 'list_transactions',
     description: 'List money transactions (expenses and income), newest first. Amounts are in the user\'s own currency.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: {
         from: { type: 'string', description: 'First day, YYYY-MM-DD' },
@@ -195,7 +212,7 @@ const tools: Anthropic.Tool[] = [
     name: 'create_transaction',
     description:
       'Record money spent or received. Expense categories: Food, Transport, Housing, Bills, Shopping, Health, Fun, Other. Income categories: Salary, Freelance, Gift, Other. Use one of these unless the user names another.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: {
         kind: { type: 'string', enum: ['expense', 'income'], description: 'Default expense' },
@@ -210,7 +227,7 @@ const tools: Anthropic.Tool[] = [
   {
     name: 'update_transaction',
     description: 'Change a transaction. Only the fields given are changed.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: {
         id: { type: 'string' },
@@ -226,13 +243,13 @@ const tools: Anthropic.Tool[] = [
   {
     name: 'delete_transaction',
     description: 'Delete a transaction.',
-    input_schema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
+    inputSchema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
   },
   {
     name: 'budget_summary',
     description:
       'Totals for one month: income, spending, spending per category, and each category\'s monthly limit. Use this for questions like "how much have I spent" or "am I over budget".',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: { month: { type: 'string', description: 'YYYY-MM, default the current month' } },
     },
@@ -240,7 +257,7 @@ const tools: Anthropic.Tool[] = [
   {
     name: 'set_budget',
     description: 'Set or change the monthly spending limit for an expense category.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: { category: { type: 'string' }, monthly_limit: { type: 'number', exclusiveMinimum: 0 } },
       required: ['category', 'monthly_limit'],
@@ -249,13 +266,13 @@ const tools: Anthropic.Tool[] = [
   {
     name: 'remove_budget',
     description: 'Remove the monthly limit for a category.',
-    input_schema: { type: 'object', properties: { category: { type: 'string' } }, required: ['category'] },
+    inputSchema: { type: 'object', properties: { category: { type: 'string' } }, required: ['category'] },
   },
   {
     name: 'list_milestones',
     description:
       'List long-term goals (milestones, like "buy a laptop") with their target dates and steps. Steps are tasks; tick them with update_task.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: { include_achieved: { type: 'boolean', description: 'Also return achieved milestones. Default false.' } },
     },
@@ -263,7 +280,7 @@ const tools: Anthropic.Tool[] = [
   {
     name: 'create_milestone',
     description: 'Add a long-term goal, optionally with its first steps.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: {
         title: { type: 'string' },
@@ -279,7 +296,7 @@ const tools: Anthropic.Tool[] = [
   {
     name: 'update_milestone',
     description: 'Change a milestone, or mark it achieved (achieved true) or not yet (achieved false). Only the fields given are changed.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: {
         id: { type: 'string' },
@@ -296,7 +313,7 @@ const tools: Anthropic.Tool[] = [
   {
     name: 'add_milestone_steps',
     description: 'Add steps to a milestone. Each step becomes a task in a list named after the milestone.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: {
         milestone_id: { type: 'string' },
@@ -311,7 +328,7 @@ const tools: Anthropic.Tool[] = [
   {
     name: 'delete_milestone',
     description: 'Delete a milestone. Its steps stay as ordinary tasks.',
-    input_schema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
+    inputSchema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
   },
 ]
 
@@ -332,36 +349,31 @@ async function run<T>(query: PromiseLike<{ data: T; error: { message: string } |
 }
 
 // Soft delete, like the app, so other devices learn about it when they sync
-const softDelete = (db: SupabaseClient, table: string, id: unknown) =>
-  run(db.from(table).update({ deleted_at: new Date().toISOString() }).eq('id', id).select('title').single())
+const softDelete = (db: Db, table: string, id: unknown) =>
+  run(db.update(table, { deleted_at: new Date().toISOString() }).eq('id', id).select('id').single())
 
 const handlers: Record<string, (input: Input, ctx: Ctx) => Promise<unknown>> = {
   async list_tasks(input, { db }) {
-    let q = db.from('tasks').select(taskCols).is('deleted_at', null).order('created_at').limit(300)
+    let q = db.select('tasks', taskCols).is('deleted_at', null).order('created_at').limit(300)
     if (!input.include_done) q = q.eq('done', false)
     return run(q)
   },
-  async create_task(input, { db, done }) {
+  async create_task(input, { db }) {
     const row = await run(
-      db
-        .from('tasks')
-        .insert({ ...pick(input, ['title', 'notes', 'list', 'due_at', 'priority']), sort_order: Date.now() })
+      db.insert('tasks', { ...pick(input, ['title', 'notes', 'list', 'due_at', 'priority']), sort_order: Date.now() })
         .select(taskCols)
         .single(),
     )
-    done.push({ kind: 'task', verb: 'added', title: String(input.title) })
     return row
   },
-  async update_task(input, { db, done }) {
+  async update_task(input, { db }) {
     const patch: Input = pick(input, ['title', 'notes', 'list', 'due_at', 'priority', 'done'])
     if (typeof input.done === 'boolean') patch.done_at = input.done ? new Date().toISOString() : null
-    const row = await run(db.from('tasks').update(patch).eq('id', input.id).select(taskCols).single())
-    done.push({ kind: 'task', verb: 'updated', title: (row as { title: string }).title })
+    const row = await run(db.update('tasks', patch).eq('id', input.id).select(taskCols).single())
     return row
   },
-  async delete_task(input, { db, done }) {
-    const row = await softDelete(db, 'tasks', input.id)
-    done.push({ kind: 'task', verb: 'deleted', title: (row as { title: string }).title })
+  async delete_task(input, { db }) {
+    await softDelete(db, 'tasks', input.id)
     return { ok: true }
   },
 
@@ -369,9 +381,7 @@ const handlers: Record<string, (input: Input, ctx: Ctx) => Promise<unknown>> = {
     const from = new Date(String(input.from)).toISOString()
     const to = new Date(String(input.to)).toISOString()
     return run(
-      db
-        .from('events')
-        .select(eventCols)
+      db.select('events', eventCols)
         .is('deleted_at', null)
         .lt('starts_at', to)
         .or(`recurrence.not.is.null,ends_at.gte."${from}",starts_at.gte."${from}"`)
@@ -379,122 +389,105 @@ const handlers: Record<string, (input: Input, ctx: Ctx) => Promise<unknown>> = {
         .limit(300),
     )
   },
-  async create_event(input, { db, done }) {
+  async create_event(input, { db }) {
     const row = pick(input, ['title', 'starts_at', 'ends_at', 'all_day', 'description', 'location', 'recurrence', 'color'])
     if (!row.ends_at && !row.all_day) row.ends_at = new Date(new Date(String(row.starts_at)).getTime() + 3_600_000).toISOString()
-    const saved = await run(db.from('events').insert(row).select(eventCols).single())
-    done.push({ kind: 'event', verb: 'added', title: String(input.title) })
+    const saved = await run(db.insert('events', row).select(eventCols).single())
     return saved
   },
-  async update_event(input, { db, done }) {
+  async update_event(input, { db }) {
     const patch = pick(input, ['title', 'starts_at', 'ends_at', 'all_day', 'description', 'location', 'recurrence', 'color'])
-    const row = await run(db.from('events').update(patch).eq('id', input.id).select(eventCols).single())
-    done.push({ kind: 'event', verb: 'updated', title: (row as { title: string }).title })
+    const row = await run(db.update('events', patch).eq('id', input.id).select(eventCols).single())
     return row
   },
-  async delete_event(input, { db, done }) {
-    const row = await softDelete(db, 'events', input.id)
-    done.push({ kind: 'event', verb: 'deleted', title: (row as { title: string }).title })
+  async delete_event(input, { db }) {
+    await softDelete(db, 'events', input.id)
     return { ok: true }
   },
 
   async search_notes(input, { db }) {
-    let q = db.from('notes').select(noteCols).is('deleted_at', null).order('updated_at', { ascending: false }).limit(20)
+    let q = db.select('notes', noteCols).is('deleted_at', null).order('updated_at', { ascending: false }).limit(20)
     const query = typeof input.query === 'string' ? input.query.trim() : ''
     if (query) q = q.textSearch('fts', query, { type: 'websearch', config: 'simple' })
     return run(q)
   },
-  async create_note(input, { db, done }) {
-    const row = await run(db.from('notes').insert(pick(input, ['title', 'body', 'tags', 'pinned'])).select(noteCols).single())
-    done.push({ kind: 'note', verb: 'added', title: String(input.title) })
+  async create_note(input, { db }) {
+    const row = await run(db.insert('notes', pick(input, ['title', 'body', 'tags', 'pinned'])).select(noteCols).single())
     return row
   },
-  async update_note(input, { db, done }) {
+  async update_note(input, { db }) {
     const row = await run(
-      db.from('notes').update(pick(input, ['title', 'body', 'tags', 'pinned'])).eq('id', input.id).select(noteCols).single(),
+      db.update('notes', pick(input, ['title', 'body', 'tags', 'pinned'])).eq('id', input.id).select(noteCols).single(),
     )
-    done.push({ kind: 'note', verb: 'updated', title: (row as { title: string }).title || 'Untitled note' })
     return row
   },
-  async delete_note(input, { db, done }) {
-    const row = await softDelete(db, 'notes', input.id)
-    done.push({ kind: 'note', verb: 'deleted', title: (row as { title: string }).title || 'Untitled note' })
+  async delete_note(input, { db }) {
+    await softDelete(db, 'notes', input.id)
     return { ok: true }
   },
 
   async list_milestones(input, { db }) {
-    let q = db.from('milestones').select(milestoneCols).is('deleted_at', null).order('target_date', { nullsFirst: false })
+    let q = db.select('milestones', milestoneCols).is('deleted_at', null).order('target_date', { nullsFirst: false })
     if (!input.include_achieved) q = q.is('achieved_at', null)
     const milestones = (await run(q)) as { id: string }[]
     if (!milestones.length) return []
     const steps = (await run(
-      db
-        .from('tasks')
-        .select('id,title,done,due_at,milestone_id')
+      db.select('tasks', 'id,title,done,due_at,milestone_id')
         .is('deleted_at', null)
         .in('milestone_id', milestones.map((m) => m.id))
         .order('sort_order'),
     )) as { milestone_id: string }[]
     return milestones.map((m) => ({ ...m, steps: steps.filter((s) => s.milestone_id === m.id) }))
   },
-  async create_milestone(input, { db, done }) {
+  async create_milestone(input, { db }) {
     const row = (await run(
-      db.from('milestones').insert(pick(input, ['title', 'description', 'emoji', 'color', 'target_date'])).select(milestoneCols).single(),
+      db.insert('milestones', pick(input, ['title', 'description', 'emoji', 'color', 'target_date'])).select(milestoneCols).single(),
     )) as { id: string; title: string }
-    done.push({ kind: 'milestone', verb: 'added', title: row.title })
     const titles = Array.isArray(input.steps) ? input.steps.map(String).filter(Boolean) : []
     const steps = titles.length ? await insertSteps(db, row, titles.map((title) => ({ title }))) : []
     return { ...row, steps }
   },
-  async update_milestone(input, { db, done }) {
+  async update_milestone(input, { db }) {
     const patch: Input = pick(input, ['title', 'description', 'emoji', 'color', 'target_date'])
     if (typeof input.achieved === 'boolean') patch.achieved_at = input.achieved ? new Date().toISOString() : null
-    const row = (await run(db.from('milestones').update(patch).eq('id', input.id).select(milestoneCols).single())) as {
+    const row = (await run(db.update('milestones', patch).eq('id', input.id).select(milestoneCols).single())) as {
       title: string
     }
-    done.push({ kind: 'milestone', verb: 'updated', title: row.title })
     return row
   },
-  async add_milestone_steps(input, { db, done }) {
-    const milestone = (await run(db.from('milestones').select('id,title').eq('id', input.milestone_id).single())) as {
+  async add_milestone_steps(input, { db }) {
+    const milestone = (await run(db.select('milestones', 'id,title').eq('id', input.milestone_id).single())) as {
       id: string
       title: string
     }
     const steps = Array.isArray(input.steps) ? (input.steps as Input[]).filter((s) => s?.title) : []
     const rows = await insertSteps(db, milestone, steps)
-    done.push({ kind: 'milestone', verb: 'updated', title: milestone.title })
     return rows
   },
-  async delete_milestone(input, { db, done }) {
-    const row = await softDelete(db, 'milestones', input.id)
-    await run(db.from('tasks').update({ milestone_id: null }).eq('milestone_id', input.id).select('id'))
-    done.push({ kind: 'milestone', verb: 'deleted', title: (row as { title: string }).title })
+  async delete_milestone(input, { db }) {
+    await softDelete(db, 'milestones', input.id)
+    await run(db.update('tasks', { milestone_id: null }).eq('milestone_id', input.id).select('id'))
     return { ok: true }
   },
 
   async list_transactions(input, { db }) {
-    let q = db.from('transactions').select(txCols).is('deleted_at', null).order('occurred_on', { ascending: false }).limit(300)
+    let q = db.select('transactions', txCols).is('deleted_at', null).order('occurred_on', { ascending: false }).limit(300)
     if (input.from) q = q.gte('occurred_on', input.from)
     if (input.to) q = q.lte('occurred_on', input.to)
     if (input.kind) q = q.eq('kind', input.kind)
     if (input.category) q = q.ilike('category', likeExact(String(input.category)))
     return run(q)
   },
-  async create_transaction(input, { db, done }) {
-    const row = await run(db.from('transactions').insert(pick(input, txFields)).select(txCols).single())
-    done.push({ kind: 'transaction', verb: 'added', title: txTitle(row) })
+  async create_transaction(input, { db }) {
+    const row = await run(db.insert('transactions', pick(input, txFields)).select(txCols).single())
     return row
   },
-  async update_transaction(input, { db, done }) {
-    const row = await run(db.from('transactions').update(pick(input, txFields)).eq('id', input.id).select(txCols).single())
-    done.push({ kind: 'transaction', verb: 'updated', title: txTitle(row) })
+  async update_transaction(input, { db }) {
+    const row = await run(db.update('transactions', pick(input, txFields)).eq('id', input.id).select(txCols).single())
     return row
   },
-  async delete_transaction(input, { db, done }) {
-    const row = await run(
-      db.from('transactions').update({ deleted_at: new Date().toISOString() }).eq('id', input.id).select(txCols).single(),
-    )
-    done.push({ kind: 'transaction', verb: 'deleted', title: txTitle(row) })
+  async delete_transaction(input, { db }) {
+    await softDelete(db, 'transactions', input.id)
     return { ok: true }
   },
   async budget_summary(input, { db, today }) {
@@ -503,14 +496,12 @@ const handlers: Record<string, (input: Input, ctx: Ctx) => Promise<unknown>> = {
     const next = m === 12 ? `${y + 1}-01` : `${y}-${String(m + 1).padStart(2, '0')}`
     const [txs, budgets] = await Promise.all([
       run(
-        db
-          .from('transactions')
-          .select('kind,amount,category')
+        db.select('transactions', 'kind,amount,category')
           .is('deleted_at', null)
           .gte('occurred_on', `${month}-01`)
           .lt('occurred_on', `${next}-01`),
       ) as Promise<{ kind: string; amount: number | string; category: string }[]>,
-      run(db.from('budgets').select('category,monthly_limit').is('deleted_at', null)) as Promise<
+      run(db.select('budgets', 'category,monthly_limit').is('deleted_at', null)) as Promise<
         { category: string; monthly_limit: number | string }[]
       >,
     ])
@@ -533,40 +524,34 @@ const handlers: Record<string, (input: Input, ctx: Ctx) => Promise<unknown>> = {
     for (const c of Object.values(byCategory)) c.spent = round(c.spent)
     return { month, income: round(income), spent: round(spent), left: round(income - spent), by_category: byCategory }
   },
-  async set_budget(input, { db, done }) {
+  async set_budget(input, { db }) {
     const existing = (await run(
-      db.from('budgets').select('id,category').is('deleted_at', null).ilike('category', likeExact(String(input.category).trim())).limit(1),
+      db.select('budgets', 'id,category').is('deleted_at', null).ilike('category', likeExact(String(input.category).trim())).limit(1),
     )) as { id: string; category: string }[]
     const category = existing[0]?.category ?? String(input.category).trim()
     const row = existing.length
-      ? await run(db.from('budgets').update({ monthly_limit: input.monthly_limit }).eq('id', existing[0].id).select().single())
-      : await run(db.from('budgets').insert({ category, monthly_limit: input.monthly_limit }).select().single())
-    done.push({ kind: 'budget', verb: existing.length ? 'updated' : 'added', title: `${category} limit ${input.monthly_limit}` })
+      ? await run(db.update('budgets', { monthly_limit: input.monthly_limit }).eq('id', existing[0].id).select().single())
+      : await run(db.insert('budgets', { category, monthly_limit: input.monthly_limit }).select().single())
     return row
   },
-  async remove_budget(input, { db, done }) {
+  async remove_budget(input, { db }) {
     const category = String(input.category).trim()
     const rows = (await run(
-      db
-        .from('budgets')
-        .update({ deleted_at: new Date().toISOString() })
+      db.update('budgets', { deleted_at: new Date().toISOString() })
         .is('deleted_at', null)
         .ilike('category', likeExact(category))
         .select('id'),
     )) as { id: string }[]
     if (!rows.length) throw new Error(`No limit is set for ${category}`)
-    done.push({ kind: 'budget', verb: 'deleted', title: `${category} limit` })
     return { ok: true }
   },
 }
 
 // Steps are tasks filed in a list named after their milestone, like the app does
-function insertSteps(db: SupabaseClient, milestone: { id: string; title: string }, steps: Input[]) {
+function insertSteps(db: Db, milestone: { id: string; title: string }, steps: Input[]) {
   const base = Date.now()
   return run(
-    db
-      .from('tasks')
-      .insert(steps.map((s, i) => ({ title: s.title, due_at: s.due_at, list: milestone.title, milestone_id: milestone.id, sort_order: base + i })))
+    db.insert('tasks', steps.map((s, i) => ({ title: s.title, due_at: s.due_at, list: milestone.title, milestone_id: milestone.id, sort_order: base + i })))
       .select('id,title,done,due_at'),
   )
 }
@@ -574,19 +559,14 @@ function insertSteps(db: SupabaseClient, milestone: { id: string; title: string 
 // Case-insensitive equality through ilike, with its wildcards escaped
 const likeExact = (s: string) => s.replace(/[\\%_]/g, '\\$&')
 
-// e.g. "Expense 12.5 · Food · lunch"
-const txTitle = (row: unknown) => {
-  const t = row as { kind: string; amount: number; category: string; note: string }
-  return [`${t.kind === 'income' ? 'Income' : 'Expense'} ${t.amount}`, t.category, t.note].filter(Boolean).join(' · ')
+// Read-only tools run without a prompt in Claude; deletes are flagged so
+// Claude asks first
+for (const tool of tools) {
+  const readOnly = /^(list_|search_|budget_summary)/.test(tool.name)
+  tool.annotations = { readOnlyHint: readOnly, destructiveHint: /^(delete_|remove_)/.test(tool.name) }
 }
 
-// ---------------------------------------------------------------- prompt
-
-const instructions = `You are the assistant inside the user's personal to-do app, which has Tasks, a Calendar, Notes, Milestones (long-term goals broken into steps) and a Budget for tracking money.
-You can read and change their data with the tools. Act on clear requests straight away instead of asking for confirmation; ask a short question only when a request is genuinely ambiguous (for example, which of two similar tasks to delete).
-Before updating or deleting, look the item up so you use its real id. Never invent ids. Amounts have no currency stored; write them the way the user does.
-Interpret dates and times in the user's time zone, given below, and always send times with their UTC offset.
-Reply briefly and warmly in plain sentences, in the language the user writes in. After making changes, say what you did in one or two lines. Use Markdown lists only when listing several items.`
+// ---------------------------------------------------------------- server
 
 function localDate(tz: string) {
   try {
@@ -596,109 +576,96 @@ function localDate(tz: string) {
   }
 }
 
-function context(tz: string, now: string) {
-  return `The user's time zone is ${tz}. Their current local date and time is ${now}.`
+function instructions(tz: string) {
+  return `This is the user's personal to-do app: Tasks, a Calendar, Notes, Milestones (long-term goals broken into steps) and a Budget for tracking money.
+Act on clear requests straight away. Before updating or deleting, look the item up so you use its real id; never invent ids.
+The user's time zone is ${tz}. Interpret dates and times there, and always send times with their UTC offset. Amounts have no currency stored; write them the way the user does.`
 }
 
-// ---------------------------------------------------------------- handler
+async function sha256(text: string) {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('')
+}
 
-type ChatMessage = { role: 'user' | 'assistant'; content: string }
+type RpcRequest = { jsonrpc: '2.0'; id?: string | number | null; method: string; params?: Record<string, unknown> }
 
-function readHistory(raw: unknown): ChatMessage[] | null {
-  if (!Array.isArray(raw)) return null
-  const msgs = raw
-    .filter(
-      (m): m is ChatMessage =>
-        (m?.role === 'user' || m?.role === 'assistant') && typeof m.content === 'string' && m.content.trim() !== '',
-    )
-    .map((m) => ({ role: m.role, content: m.content.slice(0, 8000) }))
-    .slice(-MAX_HISTORY)
-  while (msgs.length && msgs[0].role !== 'user') msgs.shift()
-  return msgs.length && msgs[msgs.length - 1].role === 'user' ? msgs : null
+const rpcResult = (id: RpcRequest['id'], result: unknown) => ({ jsonrpc: '2.0', id, result })
+const rpcError = (id: RpcRequest['id'], code: number, message: string) => ({ jsonrpc: '2.0', id: id ?? null, error: { code, message } })
+
+async function answer(msg: RpcRequest, ctx: Ctx, tz: string) {
+  switch (msg.method) {
+    case 'initialize': {
+      const asked = String(msg.params?.protocolVersion ?? '')
+      return rpcResult(msg.id, {
+        protocolVersion: PROTOCOL_VERSIONS.includes(asked) ? asked : PROTOCOL_VERSIONS[0],
+        capabilities: { tools: { listChanged: false } },
+        serverInfo: { name: 'my-todo', title: 'My To-do', version: '1.0.0' },
+        instructions: instructions(tz),
+      })
+    }
+    case 'ping':
+      return rpcResult(msg.id, {})
+    case 'tools/list':
+      return rpcResult(msg.id, { tools })
+    case 'tools/call': {
+      const name = String(msg.params?.name ?? '')
+      const handler = handlers[name]
+      if (!handler) return rpcError(msg.id, -32602, `Unknown tool ${name}`)
+      try {
+        const out = await handler((msg.params?.arguments ?? {}) as Input, ctx)
+        return rpcResult(msg.id, { content: [{ type: 'text', text: JSON.stringify(out) }] })
+      } catch (e) {
+        // Tool failures go back to Claude as results so it can explain or retry
+        const text = e instanceof Error ? e.message : String(e)
+        return rpcResult(msg.id, { content: [{ type: 'text', text }], isError: true })
+      }
+    }
+    default:
+      return rpcError(msg.id, -32601, `Method not found: ${msg.method}`)
+  }
 }
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
-  if (req.method !== 'POST') return json({ error: 'Use POST' }, 405)
+  // Stateless Streamable HTTP: no server-sent stream and no sessions to end
+  if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: { ...cors, Allow: 'POST' } })
 
-  const apiKey = Deno.env.get('ANTHROPIC_API_KEY')
-  if (!apiKey) return json({ error: 'missing_key', message: 'ANTHROPIC_API_KEY is not set on the server.' }, 500)
+  // URL is .../functions/v1/mcp/<token>
+  const token = new URL(req.url).pathname.split('/').filter(Boolean).pop() ?? ''
+  if (token.length < 32) return json(rpcError(null, -32001, 'This connector link is incomplete. Copy it again from the app.'), 401)
 
-  const auth = req.headers.get('Authorization') ?? ''
-  const db = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, {
-    global: { headers: { Authorization: auth } },
+  const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, {
     auth: { persistSession: false },
   })
-  const { data: user } = await db.auth.getUser(auth.replace(/^Bearer\s+/i, ''))
-  if (!user?.user) return json({ error: 'unauthorized', message: 'Please sign in again.' }, 401)
+  const { data: link } = await admin
+    .from('connector_tokens')
+    .select('id,user_id,timezone,last_used_at')
+    .eq('token_hash', await sha256(token))
+    .is('revoked_at', null)
+    .maybeSingle()
+  if (!link) return json(rpcError(null, -32001, 'This connector link was removed. Make a new one in the app.'), 401)
+
+  // Note when the link was last used, at most hourly
+  if (!link.last_used_at || Date.now() - Date.parse(link.last_used_at) > 3_600_000) {
+    await admin.from('connector_tokens').update({ last_used_at: new Date().toISOString() }).eq('id', link.id)
+  }
 
   const body = await req.json().catch(() => null)
-  const history = readHistory(body?.messages)
-  if (!history) return json({ error: 'bad_request', message: 'Send a conversation that ends with a user message.' }, 400)
-  const tz = typeof body?.timezone === 'string' ? body.timezone.slice(0, 64) : 'UTC'
-  const now = typeof body?.now === 'string' ? body.now.slice(0, 64) : new Date().toISOString()
+  if (!body) return json(rpcError(null, -32700, 'Parse error'), 400)
 
-  const client = new Anthropic({ apiKey })
-  const messages: Anthropic.Beta.BetaMessageParam[] = history
-  const ctx: Ctx = { db, done: [], today: localDate(tz) }
-
-  try {
-    for (let step = 0; step < MAX_STEPS; step++) {
-      const response = await client.beta.messages.create({
-        model: MODEL,
-        max_tokens: 16000,
-        betas: ['server-side-fallback-2026-07-01'],
-        fallbacks: 'default',
-        output_config: { effort: 'low' },
-        tools,
-        system: [
-          { type: 'text', text: instructions, cache_control: { type: 'ephemeral' } },
-          { type: 'text', text: context(tz, now) },
-        ],
-        messages,
-      })
-
-      if (response.stop_reason === 'refusal') {
-        return json({ reply: "Sorry, I can't help with that one.", actions: ctx.done })
-      }
-
-      const calls = response.content.filter((b): b is Anthropic.Beta.BetaToolUseBlock => b.type === 'tool_use')
-      if (response.stop_reason !== 'tool_use' || calls.length === 0) {
-        const reply = response.content
-          .filter((b): b is Anthropic.Beta.BetaTextBlock => b.type === 'text')
-          .map((b) => b.text)
-          .join('\n')
-          .trim()
-        return json({ reply: reply || 'Done.', actions: ctx.done })
-      }
-
-      messages.push({ role: 'assistant', content: response.content })
-      const results: Anthropic.Beta.BetaToolResultBlockParam[] = await Promise.all(
-        calls.map(async (call) => {
-          const handler = handlers[call.name]
-          try {
-            if (!handler) throw new Error(`Unknown tool ${call.name}`)
-            const out = await handler((call.input ?? {}) as Input, ctx)
-            return { type: 'tool_result' as const, tool_use_id: call.id, content: JSON.stringify(out) }
-          } catch (e) {
-            const message = e instanceof Error ? e.message : String(e)
-            return { type: 'tool_result' as const, tool_use_id: call.id, content: message, is_error: true }
-          }
-        }),
-      )
-      messages.push({ role: 'user', content: results })
+  const tz = link.timezone || 'UTC'
+  const ctx: Ctx = { db: scoped(admin, link.user_id), today: localDate(tz) }
+  const batch: RpcRequest[] = Array.isArray(body) ? body : [body]
+  const replies = []
+  for (const msg of batch) {
+    if (msg?.jsonrpc !== '2.0' || typeof msg.method !== 'string') {
+      replies.push(rpcError(msg?.id, -32600, 'Invalid request'))
+      continue
     }
-    return json({ reply: 'That took more steps than I allow in one go. Tell me what to continue with.', actions: ctx.done })
-  } catch (e) {
-    if (e instanceof Anthropic.AuthenticationError) {
-      return json({ error: 'bad_key', message: 'The Anthropic API key was rejected. Check the ANTHROPIC_API_KEY secret.' }, 502)
-    }
-    if (e instanceof Anthropic.RateLimitError) {
-      return json({ error: 'rate_limited', message: 'Claude is busy right now. Try again in a minute.' }, 429)
-    }
-    if (e instanceof Anthropic.APIError) {
-      return json({ error: 'api_error', message: `Claude API error ${e.status}: ${e.message}`, actions: ctx.done }, 502)
-    }
-    throw e
+    const reply = await answer(msg, ctx, tz)
+    // Notifications (no id) get no reply
+    if (msg.id !== undefined && msg.id !== null) replies.push(reply)
   }
+  if (!replies.length) return new Response(null, { status: 202, headers: cors })
+  return json(Array.isArray(body) ? replies : replies[0])
 })

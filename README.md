@@ -1,6 +1,6 @@
 # My To-do App
 
-Personal notes, calendar and tasks, with a built-in Claude assistant. A Vite + React + TypeScript app hosted on GitHub Pages, with Supabase for sign-in (Google, GitHub) and data.
+Personal notes, calendar and tasks, which you can also manage by chatting with Claude. A Vite + React + TypeScript app hosted on GitHub Pages, with Supabase for sign-in (Google, GitHub) and data.
 
 ## Local development
 
@@ -19,18 +19,18 @@ npm run dev                  # http://localhost:5173/my-todo-app/
 5. **This repo:** Settings → Pages → Source: GitHub Actions. Settings → Secrets and variables → Actions → Variables: `VITE_SUPABASE_URL` and `VITE_SUPABASE_KEY` (anon key only).
 6. Sign in once with each provider, check they map to one user, then turn off "Allow new users to sign up".
 
-## Claude assistant
+## Use with Claude
 
-The "Ask Claude" button opens a chat where Claude can read and change your tasks, events, notes, milestones and budget. It calls the Anthropic API from the Supabase Edge Function in `supabase/functions/assistant/`, so the API key never reaches the browser. Claude acts with your own sign-in, so row-level security keeps it to your data. It uses Claude Opus 5.5 at low effort; a typical message costs a few US cents, more when Claude makes several changes at once.
+Claude can read and change your tasks, events, notes, milestones and budget from a normal Claude chat (claude.ai, desktop or phone). The app is a **custom connector** for Claude: a remote MCP server in the Supabase Edge Function `supabase/functions/mcp/`. It runs on your own Claude plan, Pro included, with no API key or extra cost.
 
-A claude.ai subscription can't be used here: the API is billed separately, pay as you go.
+One-time setup:
 
-1. **API key:** at [console.anthropic.com](https://console.anthropic.com/settings/keys) create a key and add some credit (Settings → Billing). Setting a monthly spend limit there is a good idea.
-2. **Store it in Supabase:** Project → Edge Functions → Secrets → add `ANTHROPIC_API_KEY` with the key.
-3. **Deploy the function**, either way:
+1. **Database:** run `supabase/migrations/004_connector_tokens.sql` in the SQL Editor.
+2. **Deploy the function** with JWT verification off (Claude doesn't send a Supabase session; the private link is checked instead). Either way:
    - *Automatically:* create a token at [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens). In this repo, add it under Settings → Secrets and variables → Actions → Secrets as `SUPABASE_ACCESS_TOKEN`, and add a Variable `SUPABASE_PROJECT_REF` with your project ref (the `<project-ref>` in your Supabase URL). Then run the "Deploy Supabase functions" workflow once from the Actions tab; it redeploys whenever the function changes.
-   - *By hand:* Edge Functions → Deploy a new function → Via editor, name it `assistant`, paste `supabase/functions/assistant/index.ts`, and deploy.
+   - *By hand:* Edge Functions → Deploy a new function → Via editor, name it `mcp`, paste `supabase/functions/mcp/index.ts`, turn off "Verify JWT", and deploy.
+3. **Connect Claude:** in the app, open the **Claude** button → *Make link*. In Claude, go to Settings → Connectors → *Add custom connector*, name it *My To-do* and paste the link.
 
-Chat history stays in the browser tab only; nothing is stored in the database.
+The link ends in a private token; only its hash is stored. Anyone with the link can use your data, so keep it private, and remove it from the Claude panel if it leaks. The function uses the `service_role` key that Supabase provides to Edge Functions, and limits every query to the link's owner.
 
-Never commit the `service_role` key, the database password or the Anthropic API key.
+Never commit the `service_role` key or the database password.
