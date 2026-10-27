@@ -5,6 +5,7 @@ import { pages } from './lib/nav'
 import SignIn from './SignIn'
 import ThemeSwitch from './ThemeSwitch'
 import ClassicShell from './ClassicShell'
+import MetroShell from './metro/MetroShell'
 import { useTheme } from './lib/theme'
 import NotesPage from './features/notes/NotesPage'
 import CalendarPage from './features/calendar/CalendarPage'
@@ -40,6 +41,17 @@ export default function App() {
         <ClassicShell session={session} route={route}>
           {page}
         </ClassicShell>
+        <ConnectClaude />
+      </>
+    )
+  }
+
+  if (theme === 'metro') {
+    return (
+      <>
+        <MetroShell session={session} route={route}>
+          {page}
+        </MetroShell>
         <ConnectClaude />
       </>
     )
