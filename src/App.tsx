@@ -12,6 +12,7 @@ import TasksPage from './features/tasks/TasksPage'
 import MilestonesPage from './features/milestones/MilestonesPage'
 import TimelinePage from './features/timeline/TimelinePage'
 import BudgetPage from './features/budget/BudgetPage'
+import ConnectClaude from './features/assistant/ConnectClaude'
 
 
 export default function App() {
@@ -35,9 +36,12 @@ export default function App() {
 
   if (theme === 'aero-classic') {
     return (
-      <ClassicShell session={session} route={route}>
-        {page}
-      </ClassicShell>
+      <>
+        <ClassicShell session={session} route={route}>
+          {page}
+        </ClassicShell>
+        <ConnectClaude />
+      </>
     )
   }
 
@@ -71,6 +75,7 @@ export default function App() {
         {links}
         <ThemeSwitch compact />
       </nav>
+      <ConnectClaude />
     </div>
   )
 }
