@@ -619,8 +619,6 @@
   :root[data-theme='aero-classic'] .event-dialog { margin: auto; }
 }
 
-:root[data-theme='aero-classic'] .page-window { max-width: 640px; margin: 40px auto 0; }
-:root[data-theme='aero-classic'] .page-window .placeholder { padding: 2rem; color: #333; }
 
 /* ---------- Tasks: an Explorer-style window with a navigation pane ---------- */
 :root[data-theme='aero-classic'] .tasks-window { height: 100%; min-height: 520px; max-width: 980px; margin: 0 auto; }
@@ -683,4 +681,27 @@
 @media (max-width: 760px) {
   :root[data-theme='aero-classic'] .tasks-window { height: auto; min-height: 0; }
   :root[data-theme='aero-classic'] .task-views { width: auto; border-right: 0; border-bottom: 1px solid #d6e5f5; background: #f1f6fc; }
+}
+
+/* ---------- Notes: a Notepad-like window with a list pane ---------- */
+:root[data-theme='aero-classic'] .notes-window { height: 100%; min-height: 520px; max-width: 1040px; margin: 0 auto; }
+:root[data-theme='aero-classic'] .notes { padding: 0; gap: 0; }
+:root[data-theme='aero-classic'] :is(.note-list-pane, .note-pane) { border: 0; border-radius: 0; box-shadow: none; }
+:root[data-theme='aero-classic'] .note-list-pane { width: 280px; border-right: 1px solid #d6e5f5; background: linear-gradient(90deg, #f1f6fc, #e8f0fa); padding: 8px; font-family: 'Segoe UI', Tahoma, sans-serif; }
+:root[data-theme='aero-classic'] .note-list-head .cal-title { color: #1e395b; font: 400 1.3rem 'Segoe UI', sans-serif; text-shadow: none; }
+:root[data-theme='aero-classic'] .note-search { border-radius: 2px; border: 1px solid #abadb3; border-top-color: #e3e9ef; background: #fff; font-size: 12px; }
+:root[data-theme='aero-classic'] .notes button.note-item,
+:root[data-theme='aero-classic'] .notes button.note-item:hover,
+:root[data-theme='aero-classic'] .notes button.note-item:active {
+  border: 1px solid transparent; border-radius: 3px; background: none; box-shadow: none; color: #1e1e1e; font: 600 12px/1.4 'Segoe UI', Tahoma, sans-serif; padding: 5px 8px;
+}
+:root[data-theme='aero-classic'] .notes button.note-item:hover { border-color: #b8d6fb; background: linear-gradient(#fafbfd, #ebf3fd); }
+:root[data-theme='aero-classic'] .notes button.note-item[aria-current='true'] { border-color: #84acdd; background: linear-gradient(#dcebfc, #c1dbfc); }
+:root[data-theme='aero-classic'] .notes button.note-chip { min-height: 0; padding: 1px 8px; font-size: 11px; border-radius: 3px; }
+:root[data-theme='aero-classic'] .note-pane { background: #fff; }
+:root[data-theme='aero-classic'] .note-title { font: 400 1.4rem 'Segoe UI', sans-serif; color: #1e395b; }
+:root[data-theme='aero-classic'] .note-body { font: 14px/1.55 Consolas, 'Lucida Console', monospace; color: #000; }
+@media (max-width: 760px) {
+  :root[data-theme='aero-classic'] .notes-window { height: auto; min-height: 70dvh; }
+  :root[data-theme='aero-classic'] .note-list-pane { width: auto; border-right: 0; }
 }
